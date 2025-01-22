@@ -724,7 +724,7 @@ export function extractAddress(ocrText) {
     // Define a pattern to match up to the address, excluding anything starting with 令, 令和, or 和
     if(ocrText)
     {
-    const addressPattern = /^.*?(?=令|令和|和)/;
+    const addressPattern = /^.*?(?=令和|令和|平成)/;
 
     // Match the address using the pattern
     const match = ocrText.match(addressPattern);
