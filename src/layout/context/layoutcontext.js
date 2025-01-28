@@ -83,6 +83,7 @@ export const LayoutProvider = (props) => {
     
         script.onload = async () => {
           try {
+            setLoader(true)
             const scan = new WebFxScan();
             await scan.connect({
               ip: '127.0.0.1',
@@ -92,12 +93,15 @@ export const LayoutProvider = (props) => {
             });
             await scan.init();
             setWebFxScan(scan);
+            setLoader(false)
           } catch (err) {
+            setLoader(false)
             console.error('Failed to initialize scanner:', err);
           }
         };
     
         script.onerror = () => {
+           setLoader(false)
           console.error('Failed to load scanner SDK');
         };
     
@@ -112,6 +116,7 @@ export const LayoutProvider = (props) => {
           if (!webFxScaner) return;
       
           try {
+            setLoader(true)
             const result = await webFxScaner.getDeviceList();
             if (result.result && result.data?.options.length > 0) {
               const firstScanner = result.data.options[0];
@@ -126,12 +131,14 @@ export const LayoutProvider = (props) => {
                 contrast: 0,
                 quality: 100,
               });
-      
+              setLoader(false)
               console.log('First scanner initialized:', firstScanner.deviceName);
             } else {
+              setLoader(false)
               console.error('No scanners available');
             }
           } catch (err) {
+            setLoader(false)
             console.error('Failed to initialize first scanner:', err);
           }
         }, [webFxScaner]);
