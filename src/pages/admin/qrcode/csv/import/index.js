@@ -103,12 +103,12 @@ export default function AdminQrCodeCreatePage() {
      */
     const onImportSuccess = (response) => {
         if (response) {
-            if (window.location.origin === "https://rakuraku.nichi.in" || window.location.origin === "http://localhost:3000") {
+            //if (window.location.origin === "https://rakuraku.nichi.in" || window.location.origin === "http://localhost:3000") {
             localStorage.setItem('batch_id', response.data.data.batch_id);
-            }
-            else {         
-            setQrCodeCreateDialogVisible(true);
-            }
+            // }
+            // else {         
+            // setQrCodeCreateDialogVisible(true);
+            // }
         }
         setImportFileData("");
         if (fileInputRef.current) {
