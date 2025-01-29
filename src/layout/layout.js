@@ -91,7 +91,7 @@ const Layout = (props) => {
         });
     }, []);
     useEffect(() => {
-        if (window.location.origin === "https://rakuraku.nichi.in" || window.location.origin === "http://localhost:3000") {
+       
         const interval = setInterval(() => {
           const currentValue = localStorage.getItem("batch_id") || "";
           
@@ -105,7 +105,7 @@ const Layout = (props) => {
     
         // Cleanup interval on component unmount
         return () => clearInterval(interval);
-    }
+
       }, [localStorage.getItem("batch_id")]);
 
 
