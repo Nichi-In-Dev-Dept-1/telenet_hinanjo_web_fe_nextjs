@@ -11,7 +11,9 @@ import {
     convertToSingleByte,
     showOverFlow,
     hideOverFlow,
-    getEnglishDateDisplayFormat
+    getEnglishDateDisplayFormat,
+    extractAddress,
+    geocodeAddressAndExtractData
 } from "@/helper";
 import {
     Button,
@@ -274,7 +276,7 @@ export default function UserEventRegModal(props) {
                 individualQuestions: null,
                 telAsRep: false,
                 addressAsRep: false,
-                password: ""
+                password: "1234"
             };
 
     function calculateAge(birthdate) {
@@ -325,7 +327,19 @@ export default function UserEventRegModal(props) {
         showOverFlow();
     };
 
-    const register = (data) => {
+    const register = async(data) => {
+         if (!data.prefecture_id || !data.postal_code) {
+              let address = extractAddress(data.fullAddress) || extractAddress(data.address);
+        
+              try {
+                const { prefecture, postalCode, prefecture_id } = await geocodeAddressAndExtractData(address, localeJson, locale, setLoader);
+        
+                data['postal_code'] = postalCode;
+                data['prefecture_id'] = prefecture_id;
+              } catch (error) {
+                console.error("Error processing address:", error);
+              }
+            }
         formikRef.current.setFieldValue("postalCode", data.postal_code);
         formikRef.current.setFieldValue("prefecture_id", data.prefecture_id);
         formikRef.current.setFieldValue("address", data.address);
