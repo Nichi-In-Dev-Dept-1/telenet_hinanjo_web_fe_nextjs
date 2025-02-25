@@ -76,7 +76,9 @@ export default function ExternalEvacuees() {
                     align: "end"
                 },
                 ticks: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    stepSize: 1,
+                    maxTicksLimit: 7, 
                 },
                 grid: {
                     display: false,
