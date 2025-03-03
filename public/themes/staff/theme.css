@@ -1511,7 +1511,7 @@
 }
 
 .p-multiselect .p-multiselect-label {
-  padding: 0.75rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 

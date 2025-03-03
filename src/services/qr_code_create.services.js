@@ -91,10 +91,9 @@ function _callBatchDownload(payload,callBackFun) {
             }
         })
         .catch((error) => {
-            if(error.response?.status != 400)
-            {
+            console.log(error);
+            localStorage.setItem('batch_id','');
             callBackFun(false);
-            toastDisplay(error?.response);
-            }     
+            toastDisplay(error?.response);  
         });
 }
