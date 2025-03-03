@@ -284,15 +284,25 @@ export const timestampFile = (fileName) => {
  */
 export const zipDownloadWithURL = (zipURL) => {
     if (zipURL) {
-        // Create a temporary anchor element for the download
-        let date = getYYYYMMDDHHSSSSDateTimeFormat(new Date())
+        let date = getYYYYMMDDHHSSSSDateTimeFormat(new Date());
+        const fileName = `Sample_${date}.zip`;
+
+        // Create an invisible anchor element
         const link = document.createElement('a');
         link.href = zipURL;
-        const fileName = `Sample_${date}.zip`;
-        link.setAttribute('download', fileName); // Specify the file name you want to give to the downloaded file
+        link.setAttribute('download', fileName);
+        link.setAttribute('target', '_blank'); // Opens in a new tab (useful if needed)
+        link.style.display = 'none';
+        
+        // Append to body and trigger download
+        document.body.appendChild(link);
         link.click();
+
+        // Clean up
+        document.body.removeChild(link);
     }
-}
+};
+
 
 /**
  * Function help to display error messages on toast
