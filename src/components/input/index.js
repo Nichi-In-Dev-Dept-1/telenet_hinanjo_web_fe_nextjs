@@ -543,29 +543,49 @@ export const MultiSelect = (props) => {
     ...restProps
   } = props && props.multiSelectProps;
 
-  const [selectedValues, setSelectedValues] = useState(restProps.value || []);
+  const disabledOptions = restProps.options?.filter((option) => option.disabled).map((option) => option.value) || [];
+
+  // Ensure disabled options are always selected initially
+  const [selectedValues, setSelectedValues] = useState(() => [
+    ...new Set([...disabledOptions, ...(restProps.value || [])]),
+  ]);
   // State for allValues, updated dynamically
   const [allValues, setAllValues] = useState(
     restProps.options?.map((option) => option.value) || []
   );
   const [allSelected, setAllSelected] = useState(false);
+  useEffect(() => {
+    setSelectedValues(() => [
+      ...new Set([...disabledOptions, ...(restProps.value || [])]),
+    ]);
+  }, [restProps.value]);
     useEffect(() => {
       setAllSelected(selectedValues.length === allValues.length && allValues.length > 0);
-    }, [selectedValues, allValues]);
+    }, [selectedValues, allValues,restProps.value]);
 
   // Toggle Select All functionality
-  const toggleSelectAll = () => {
-    setSelectedValues(allSelected ? [] : allValues);
+   const toggleSelectAll = () => {
+    let updatedValues = allSelected ? [] : allValues;
+
+    // Ensure disabled options remain selected
+    updatedValues = [...new Set([...disabledOptions, ...updatedValues])];
+
+    setSelectedValues(updatedValues);
     if (onChange) {
-      onChange({ value: allSelected ? [] : allValues });
+      onChange({ value: updatedValues });
     }
   };
 
+  // Handle selection change
   const handleSelectionChange = (e) => {
-    const updatedValues = e.value;
+    let updatedValues = e.value;
+
+    // Ensure disabled options remain selected
+    updatedValues = [...new Set([...disabledOptions, ...updatedValues])];
+
     setSelectedValues(updatedValues);
     if (onChange) {
-        onChange(e);
+      onChange(e);
     }
   };
 

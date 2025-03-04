@@ -4,8 +4,9 @@ import * as Yup from 'yup';
 
 import { getValueByKeyRecursively as translate, zipDownloadWithURL } from '@/helper'
 import { LayoutContext } from '@/layout/context/layoutcontext';
-import { Button, InputFile, ValidationError, CommonDialog, CustomHeader, AdminManagementDeleteModal } from '@/components';
+import { Button, InputFile, ValidationError, CommonDialog, CustomHeader, AdminManagementDeleteModal, MultiSelect, Input } from '@/components';
 import { QRCodeCreateServices } from '@/services';
+import toast from 'react-hot-toast';
 
 export default function AdminQrCodeCreatePage() {
     const { localeJson, setLoader } = useContext(LayoutContext);
@@ -13,6 +14,9 @@ export default function AdminQrCodeCreatePage() {
     const [initialValues, setInitialValues] = useState({
         file: null,
         updateFile:null,
+        selectedBasicInfo:["name","address","tel","dob"],
+        project_name:"らくらく避難所くん",
+        name:"テレネット株式会社"
     })
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [importFileData, setImportFileData] = useState("");
@@ -23,6 +27,12 @@ export default function AdminQrCodeCreatePage() {
     const fileInputRef = useRef(null);
     const formRef = useRef(null);
     const [batchId, setBatchId] = useState(localStorage.getItem("batch_id") || "");
+    const translationOptions = [
+        { label: translate(localeJson, "name"), value: 'name',disabled: true},
+        { label: translate(localeJson, "address"), value: 'address' },
+        { label: translate(localeJson, "tel"), value: 'tel' },
+        { label: translate(localeJson, "dob"), value: 'dob' },
+      ];
 
     const schema = Yup.object().shape({
         file: Yup.mixed()
@@ -61,6 +71,8 @@ export default function AdminQrCodeCreatePage() {
                     fileReader.readAsText(updateFile);
                 });
             }),
+            name:Yup.string().max(25, translate(localeJson, "company_name_max_length")),
+            project_name:Yup.string().max(25, translate(localeJson, "project_name_max_length")),
             
     });
 
@@ -89,10 +101,30 @@ export default function AdminQrCodeCreatePage() {
     const handleFormSubmit = async (values, { resetForm, setFieldValue }) => {
         if (importFileData) {
             setLoader(true);
+        const updatedSelection = values.selectedBasicInfo.includes("name")
+        ? values.selectedBasicInfo
+        : ["name", ...values.selectedBasicInfo];
+        updatedSelection.forEach((basicInfo) => {
+            importFileData.append(`check_box[]`, basicInfo);
+        });
+           importFileData.append("project_name", values.project_name || "");
+            importFileData.append("company_name", values.name || ""); // Append title_name (default to empty string if null)
             callImport(importFileData,(res)=>{
                 onImportSuccess(res);
+                let val = {
+                    file: null,
+                    updateFile:null,
+                    selectedBasicInfo:["name","address","tel","dob"],
+                    project_name:"らくらく避難所くん",
+                    name:"テレネット株式会社"
+                }
             // Reset the form after submission
-            resetForm({ values: initialValues });
+            resetForm({ values: val });
+            formRef?.current.setFieldValue("selectedBasicInfo",val.selectedBasicInfo);
+            toast.success(translate(localeJson,'qr_import_success'), {
+                position: "top-right",
+            });
+            // setInitialValues(val);
             } );
         }
     }
@@ -250,7 +282,7 @@ export default function AdminQrCodeCreatePage() {
                                     <div>
                                         <div>
                                             <div>
-                                                <div className='flex pb-2' style={{ justifyContent: "flex-end", flexWrap: "wrap" }}>
+                                                <div className='flex pb-3' style={{ justifyContent: "flex-end", flexWrap: "wrap" }}>
                                                     <Button buttonProps={{
                                                         type: 'button',
                                                         rounded: "true",
@@ -260,7 +292,7 @@ export default function AdminQrCodeCreatePage() {
                                                     }} parentClass={"export-button"} />
                                                 </div>
                                             </div>
-                                            <div>
+                                            <div className='pb-3'>
                                                 <InputFile inputFileProps={{
                                                     name: 'file',
                                                     inputFileStyle: { fontSize: "12px" },
@@ -278,6 +310,84 @@ export default function AdminQrCodeCreatePage() {
                                                     <ValidationError errorBlock={errors.file && touched.file && errors.file} />
                                                 </div>
                                             </div>
+                                            <div className='w-full flex lg:flex-row flex-column'>
+                                            <div className='xl:w-5 lg:w-6 w-full'>
+                                            <div className='pb-3'>
+                                                 <MultiSelect
+                                                                  multiSelectProps={{
+                                                                    labelProps: {
+                                                                      text: translate(localeJson, "qr_output_items"),
+                                                                      inputMultiSelectLabelClassName: "block",
+                                                                      labelMainClassName: "pb-1",
+                                                                      spanText: "",
+                                                                      inputMultiSelectLabelSpanClassName: " p-error",
+                                                                    },
+                                                                    multiSelectClassName: "xl:w-22rem lg:w-18rem md:w-full w-full h-40",
+                                                                    float: false,
+                                                                    floatLabelProps: {},
+                                                                    value: values.selectedBasicInfo,
+                                                                    options: translationOptions,
+                                                                    defaultDisabledOption: "refugee_name", 
+                                                                    selectAllLabel: translate(
+                                                                      localeJson,
+                                                                      "place_event_bulk_checkout_column_name"
+                                                                    ),
+                                                                    onChange: (e) => {
+                                                                        setFieldValue("selectedBasicInfo",e.value);
+                                                                    },
+                                                                    placeholder: "",
+                                                                  }}
+                                                                />
+                                            </div>
+                                            <div className="pb-3">
+                                                                      <Input
+                                                                        inputProps={{
+                                                                          inputParentClassName: `custom_input ${errors.project_name && touched.project_name && "p-invalid pb-1"}`,
+                                                                          labelProps: {
+                                                                            text: translate(localeJson, 'project_name'),
+                                                                            inputLabelClassName: "block",
+                                                                          },
+                                                                          inputClassName: "xl:w-22rem lg:w-18rem md:w-full w-full h-40",
+                                                                          value: values.project_name,
+                                                                          onChange: handleChange,
+                                                                          onBlur: handleBlur,
+                                                                          id: "project_name",
+                                                                          name: "project_name",
+                                                                        }}
+                                                                      />
+                                                                      <ValidationError
+                                                                        errorBlock={
+                                                                          errors.project_name &&
+                                                                          touched.project_name &&
+                                                                          errors.project_name
+                                                                        }
+                                                                      />
+                                                                    </div>
+                                                                    <div className="">
+                                                                      <Input
+                                                                        inputProps={{
+                                                                          inputParentClassName: `custom_input ${errors.name && touched.name && "p-invalid pb-1"}`,
+                                                                          labelProps: {
+                                                                            text: translate(localeJson, 'company_name'),
+                                                                            inputLabelClassName: "block",
+                                                                          },
+                                                                          inputClassName: "xl:w-22rem lg:w-18rem md:w-full w-full h-40",
+                                                                          value: values.name,
+                                                                          onChange: handleChange,
+                                                                          onBlur: handleBlur,
+                                                                          id: "name",
+                                                                          name: "name",
+                                                                        }}
+                                                                      />
+                                                                      <ValidationError
+                                                                        errorBlock={
+                                                                          errors.name &&
+                                                                          touched.name &&
+                                                                          errors.name
+                                                                        }
+                                                                      />
+                                                                    </div>
+                                        
                                             <div className='flex my-3' style={{ justifyContent: "flex-start", flexWrap: "wrap" }}>
                                                 <div>
                                                     <Button buttonProps={{
@@ -291,12 +401,10 @@ export default function AdminQrCodeCreatePage() {
                                                     }} parentClass={"import-button"} />
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
+                                            </div>
+                                            <div className="xl:w-7 lg:w-6 w-full">
                                 <CustomHeader headerClass={"page-header1"} header={translate(localeJson, "imp_notes")} />
-                                <div className="">
+                                <div>
         {/* Full Name */}
         <div className="col-12 flex flex-wrap align-items-baseline">
           <strong>{translate(localeJson, "fullName_header")}：</strong>
@@ -340,6 +448,11 @@ export default function AdminQrCodeCreatePage() {
         </div>
       </div>
                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+ 
                             </div>
                         </div>
                     </div>
