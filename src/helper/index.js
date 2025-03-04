@@ -282,24 +282,9 @@ export const timestampFile = (fileName) => {
  * Zip download functionality
  * @param zipURL
  */
-export const zipDownloadWithURL = (zipURL) => {
+export const zipDownloadWithURL = async(zipURL) => {
     if (zipURL) {
-        let date = getYYYYMMDDHHSSSSDateTimeFormat(new Date());
-        const fileName = `Sample_${date}.zip`;
-
-        // Create an invisible anchor element
-        const link = document.createElement('a');
-        link.href = zipURL;
-        link.setAttribute('download', fileName);
-        link.setAttribute('target', '_blank'); // Opens in a new tab (useful if needed)
-        link.style.display = 'none';
-        
-        // Append to body and trigger download
-        document.body.appendChild(link);
-        link.click();
-
-        // Clean up
-        document.body.removeChild(link);
+        window.open(zipURL, "_blank");
     }
 };
 
