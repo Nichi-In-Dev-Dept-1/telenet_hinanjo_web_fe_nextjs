@@ -1090,5 +1090,6 @@
       "company_name":"会社名",
       "company_name_max_length":"会社名は25文字までです。",
       "project_name":"システム名",
-      "project_name_max_length":"システム名は25文字までです。"
+      "project_name_max_length":"システム名は25文字までです。",
+      "qr_import_success":"QRコードの作成を開始しました。ダウンロード可能になりましたら通知メッセージが表示されます。"
 }

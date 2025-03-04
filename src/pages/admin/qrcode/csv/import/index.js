@@ -6,6 +6,7 @@ import { getValueByKeyRecursively as translate, zipDownloadWithURL } from '@/hel
 import { LayoutContext } from '@/layout/context/layoutcontext';
 import { Button, InputFile, ValidationError, CommonDialog, CustomHeader, AdminManagementDeleteModal, MultiSelect, Input } from '@/components';
 import { QRCodeCreateServices } from '@/services';
+import toast from 'react-hot-toast';
 
 export default function AdminQrCodeCreatePage() {
     const { localeJson, setLoader } = useContext(LayoutContext);
@@ -119,7 +120,10 @@ export default function AdminQrCodeCreatePage() {
                 }
             // Reset the form after submission
             resetForm({ values: val });
-            formRef?.current.setFieldValue("selectedBasicInfo",val.selectedBasicInfo)
+            formRef?.current.setFieldValue("selectedBasicInfo",val.selectedBasicInfo);
+            toast.success(translate(localeJson,'qr_import_success'), {
+                position: "top-right",
+            });
             // setInitialValues(val);
             } );
         }

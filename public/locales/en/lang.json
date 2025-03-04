@@ -1094,5 +1094,6 @@
     "company_name":"Company Name",
     "company_name_max_length":"The company name can be up to 25 characters.",
      "project_name":"System Name",
-    "project_name_max_length":"The System name can be up to 25 characters."
+    "project_name_max_length":"The System name can be up to 25 characters.",
+     "qr_import_success":"We have started creating your QR code. You will be notified when it is ready to download."
 }
