@@ -14,8 +14,8 @@ export default function AdminQrCodeCreatePage() {
         file: null,
         updateFile:null,
         selectedBasicInfo:["name","address","tel","dob"],
-        project_name:"",
-        name:""
+        project_name:"らくらく避難所くん",
+        name:"テレネット株式会社"
     })
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [importFileData, setImportFileData] = useState("");
@@ -110,8 +110,17 @@ export default function AdminQrCodeCreatePage() {
             importFileData.append("company_name", values.name || ""); // Append title_name (default to empty string if null)
             callImport(importFileData,(res)=>{
                 onImportSuccess(res);
+                let val = {
+                    file: null,
+                    updateFile:null,
+                    selectedBasicInfo:["name","address","tel","dob"],
+                    project_name:"らくらく避難所くん",
+                    name:"テレネット株式会社"
+                }
             // Reset the form after submission
-            resetForm({ values: initialValues });
+            resetForm({ values: val });
+            formRef?.current.setFieldValue("selectedBasicInfo",val.selectedBasicInfo)
+            // setInitialValues(val);
             } );
         }
     }
@@ -297,6 +306,8 @@ export default function AdminQrCodeCreatePage() {
                                                     <ValidationError errorBlock={errors.file && touched.file && errors.file} />
                                                 </div>
                                             </div>
+                                            <div className='w-full flex lg:flex-row flex-column'>
+                                            <div className='xl:w-5 lg:w-6 w-full'>
                                             <div className='pb-3'>
                                                  <MultiSelect
                                                                   multiSelectProps={{
@@ -307,7 +318,7 @@ export default function AdminQrCodeCreatePage() {
                                                                       spanText: "",
                                                                       inputMultiSelectLabelSpanClassName: " p-error",
                                                                     },
-                                                                    multiSelectClassName: "lg:w-22rem md:w-full w-full h-40",
+                                                                    multiSelectClassName: "xl:w-22rem lg:w-18rem md:w-full w-full h-40",
                                                                     float: false,
                                                                     floatLabelProps: {},
                                                                     value: values.selectedBasicInfo,
@@ -332,7 +343,7 @@ export default function AdminQrCodeCreatePage() {
                                                                             text: translate(localeJson, 'project_name'),
                                                                             inputLabelClassName: "block",
                                                                           },
-                                                                          inputClassName: "lg:w-22rem md:w-full w-full h-40",
+                                                                          inputClassName: "xl:w-22rem lg:w-18rem md:w-full w-full h-40",
                                                                           value: values.project_name,
                                                                           onChange: handleChange,
                                                                           onBlur: handleBlur,
@@ -356,7 +367,7 @@ export default function AdminQrCodeCreatePage() {
                                                                             text: translate(localeJson, 'company_name'),
                                                                             inputLabelClassName: "block",
                                                                           },
-                                                                          inputClassName: "lg:w-22rem md:w-full w-full h-40",
+                                                                          inputClassName: "xl:w-22rem lg:w-18rem md:w-full w-full h-40",
                                                                           value: values.name,
                                                                           onChange: handleChange,
                                                                           onBlur: handleBlur,
@@ -386,12 +397,10 @@ export default function AdminQrCodeCreatePage() {
                                                     }} parentClass={"import-button"} />
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
+                                            </div>
+                                            <div className="xl:w-7 lg:w-6 w-full">
                                 <CustomHeader headerClass={"page-header1"} header={translate(localeJson, "imp_notes")} />
-                                <div className="">
+                                <div>
         {/* Full Name */}
         <div className="col-12 flex flex-wrap align-items-baseline">
           <strong>{translate(localeJson, "fullName_header")}：</strong>
@@ -435,6 +444,11 @@ export default function AdminQrCodeCreatePage() {
         </div>
       </div>
                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+ 
                             </div>
                         </div>
                     </div>

@@ -1086,9 +1086,9 @@
       "qr_scan":"QRスキャナ",
       "qr_scan_message":"QRコードから読み取って入力を行います。",
       "qr_scan_message2":"ウェブカメラや外部バーコードスキャンが使用可能です。",
-      "qr_output_items":"QRコードと一緒に出力項目を選択してください。",
+      "qr_output_items":"テキスト出力項目",
       "company_name":"会社名",
       "company_name_max_length":"会社名は25文字までです。",
-      "project_name":"案件名",
-      "project_name_max_length":"案件名は25文字までです。"
+      "project_name":"システム名",
+      "project_name_max_length":"システム名は25文字までです。"
 }
