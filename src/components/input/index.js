@@ -554,9 +554,14 @@ export const MultiSelect = (props) => {
     restProps.options?.map((option) => option.value) || []
   );
   const [allSelected, setAllSelected] = useState(false);
+  useEffect(() => {
+    setSelectedValues(() => [
+      ...new Set([...disabledOptions, ...(restProps.value || [])]),
+    ]);
+  }, [restProps.value]);
     useEffect(() => {
       setAllSelected(selectedValues.length === allValues.length && allValues.length > 0);
-    }, [selectedValues, allValues]);
+    }, [selectedValues, allValues,restProps.value]);
 
   // Toggle Select All functionality
    const toggleSelectAll = () => {
