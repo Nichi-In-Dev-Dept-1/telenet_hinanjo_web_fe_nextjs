@@ -502,13 +502,13 @@ export default function AdminHistoryPlacePage() {
                   />
                 </div>
                 <form>
-                  <div className="modal-field-top-space modal-field-bottom-space flex sm:flex-no-wrap md:w-auto flex-wrap flex-grow float-right align-items-end justify-content-end gap-3 lg:gap-2 md:gap-2 sm:gap-2 mobile-input ">
+                  <div className="modal-field-top-space modal-field-bottom-space flex md:flex-no-wrap md:w-auto flex-wrap flex-grow float-right align-items-end justify-content-end gap-3 lg:gap-2 md:gap-2 sm:gap-2 mobile-input ">
                     <DateTime
                       callOnActionFlag={true}
                       callOnCancel={() => setSelectedDate(null)}
                       dateTimeProps={{
                         dateTimeParentClassName:
-                          "w-full lg:w-23rem md:w-23rem sm:w-14rem ",
+                          "w-full lg:w-25rem md:w-23rem",
                         labelProps: {
                           text: translate(localeJson, "report_date_time"),
                           inputDropdownLabelClassName: "block",
@@ -516,7 +516,7 @@ export default function AdminHistoryPlacePage() {
                         },
                         inputId: "historyDateSearch",
                         dateTimeClass:
-                          "w-full lg:w-23rem md:w-23rem sm:w-14rem",
+                          "w-full lg:w-25rem md:w-23rem",
                         selectionMode: "range",
                         panelStyle: { marginTop: "0px" },
                         date: getDefaultTodayDateTime,
@@ -526,13 +526,13 @@ export default function AdminHistoryPlacePage() {
                     <InputDropdown
                       inputDropdownProps={{
                         inputDropdownParentClassName:
-                          "w-full lg:w-13rem md:w-14rem sm:w-14rem",
+                          "w-full lg:w-13rem md:w-14rem",
                         labelProps: {
                           text: translate(localeJson, "shelter_place_name"),
                           inputDropdownLabelClassName: "block",
                         },
                         inputDropdownClassName:
-                          "w-full lg:w-13rem md:w-14rem sm:w-14rem",
+                          "w-full lg:w-13rem md:w-14rem",
                         customPanelDropdownClassName: "w-10rem",
                         value: selectedCity,
                         options: historyPlaceDropdown,
