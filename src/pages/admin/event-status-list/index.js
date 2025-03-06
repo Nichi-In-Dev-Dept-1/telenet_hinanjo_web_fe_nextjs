@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import _ from 'lodash';
 
 import { NormalTable, Button, CustomHeader, InputDropdown } from '@/components';
-import { getValueByKeyRecursively as translate } from '@/helper'
+import { getEnglishDateTimeDisplayActualFormat, getJapaneseDateTimeDayDisplayActualFormat, getValueByKeyRecursively as translate } from '@/helper'
 import { LayoutContext } from '@/layout/context/layoutcontext';
 import { AdminEventStatusServices, CommonServices } from '@/services';
 
@@ -33,9 +33,21 @@ function EventStatusList() {
         { field: 'number', header: translate(localeJson, 'number'), headerClassName: "custom-header", className: "sno_class", textAlign: 'center', alignHeader: "left" },
         { field: 'name', header: translate(localeJson, 'questionnaire_name'), minWidth: '15rem', maxWidth: "15rem", headerClassName: "custom-header" },
         { field: 'total_person', header: translate(localeJson, 'number_of_evacuees_event_status_list'), minWidth: '10rem', headerClassName: "custom-header", fontWeight: "bold", textAlign: "center", alignHeader: "center" },
-        { field: 'maleCount', header: translate(localeJson, 'male'), minWidth: '5rem', headerClassName: "custom-header", textAlign: "center", alignHeader: "center" },
+        { field: 'maleCount', header: translate(localeJson, 'male'), minWidth: '6rem', headerClassName: "custom-header", textAlign: "center", alignHeader: "center" },
         { field: 'femaleCount', header: translate(localeJson, 'female'), minWidth: "7rem", headerClassName: "custom-header", textAlign: "center", alignHeader: "center" },
         { field: 'othersCount', header: translate(localeJson, 'others_count'), minWidth: "10rem", headerClassName: "custom-header", textAlign: "center", alignHeader: "center" },
+        {
+              field: "event_opening_date_time",
+              header: translate(localeJson, "opened_date_time"),
+              minWidth: "10rem",
+              sortable: false,
+            },
+            {
+              field: "event_closing_date_time",
+              header: translate(localeJson, "closed_date_time"),
+              minWidth: "10rem",
+              sortable: false,
+            },
     ];
 
     const rowClassName = (rowData) => {
@@ -58,6 +70,24 @@ function EventStatusList() {
                         maleCount: `${element.maleCount}${translate(localeJson, 'people')}`,
                         femaleCount: `${element.femaleCount}${translate(localeJson, 'people')}`,
                         othersCount: `${element.othersCount}${translate(localeJson, 'people')}`,
+                            event_opening_date_time: element.start_date
+                                    ? locale == "ja"
+                                      ? getJapaneseDateTimeDayDisplayActualFormat(
+                                        element.start_date
+                                      )
+                                      : getEnglishDateTimeDisplayActualFormat(
+                                        element.start_date
+                                      )
+                                    : "",
+                                  event_closing_date_time: element.end_date
+                                    ? locale == "ja"
+                                      ? getJapaneseDateTimeDayDisplayActualFormat(
+                                        element.end_date
+                                      )
+                                      : getEnglishDateTimeDisplayActualFormat(
+                                        element.end_date
+                                      )
+                                    : "",
                     };
                     tempList.push(tempObj);
                 });
@@ -69,6 +99,8 @@ function EventStatusList() {
                     maleCount: `${totalCountList.totalMale}${translate(localeJson, 'people')}`,
                     femaleCount: `${totalCountList.totalFemale}${translate(localeJson, 'people')}`,
                     othersCount: `${totalCountList.totalOther}${translate(localeJson, 'people')}`,
+                    event_opening_date_time: "",
+                    event_closing_date_time: "",
                 };
                 frozenObj = [preparedFrozenObj];
                 listTotalCount = response.data.model.total;
