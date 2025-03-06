@@ -508,7 +508,7 @@ export default function AdminHistoryPlacePage() {
                       callOnCancel={() => setSelectedDate(null)}
                       dateTimeProps={{
                         dateTimeParentClassName:
-                          "w-full lg:w-25rem md:w-23rem",
+                          "w-full lg:w-27rem md:w-27rem",
                         labelProps: {
                           text: translate(localeJson, "report_date_time"),
                           inputDropdownLabelClassName: "block",
@@ -516,7 +516,7 @@ export default function AdminHistoryPlacePage() {
                         },
                         inputId: "historyDateSearch",
                         dateTimeClass:
-                          "w-full lg:w-25rem md:w-23rem",
+                          "w-full lg:w-27rem md:w-27rem",
                         selectionMode: "range",
                         panelStyle: { marginTop: "0px" },
                         date: getDefaultTodayDateTime,
