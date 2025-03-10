@@ -166,6 +166,7 @@ export default function PublicExternal() {
     address: "",
     address2: "",
     email: "",
+    specific_location:"",
     toggleSwitches: Array(3).fill(false),
     toggleFoodSwitches: Array(2).fill(false),
     togglePlaceSwitches: "",
@@ -260,6 +261,17 @@ export default function PublicExternal() {
             }
           }
         ),
+        specific_location: Yup.string().nullable().test(
+          "required-when-toggleSwitches-true",
+          translate(localeJson, "c_required"),
+          (value, parent) => {
+            if (parent.parent.toggleSwitches[1] === true || parent.parent.toggleSwitches[2] === true) {
+              return !!value;
+            } else {
+              return true;
+            }
+          }
+        ).max(255, translate(localeJson, "specified_loc_max_len")),
     });
 
 
@@ -510,6 +522,7 @@ export default function PublicExternal() {
             "address": data.address+data?.address2,
             "address_default": data.address2,
             "email": data.email,
+            "place_detail": data.specific_location,
             "person": data.evacuee.map((evacuee) => ({
               "name": evacuee.name,
               "name_kanji": evacuee.name_kanji,
@@ -606,6 +619,47 @@ export default function PublicExternal() {
                         )}
                       </div>
                     )}
+                     {(values.toggleSwitches[1] == true ||
+                      values.toggleSwitches[2] == true) && (
+                        <div className="mt-4">
+                            <Input
+                              inputProps={{
+                                spanText: "*",
+                                name: "specific_location",
+                                spanClass: "p-error",
+                                value: values.specific_location,
+                                onChange: handleChange,
+                                onBlur: handleBlur,
+                                labelProps: {
+                                  text: translate(
+                                    localeJson,
+                                    "out_side_city_question"
+                                  ),
+                                  spanText: "*",
+                                  inputLabelClassName: "block font-bold",
+                                  inputLabelSpanClassName: "p-error",
+                                  labelMainClassName: "pb-2",
+                                },
+                                inputClassName: "w-full",
+                                inputClass:
+                                  "w-full lg:w-25rem md:w-23rem sm:w-21rem ",
+                              }}
+                              
+                              parentClass={`${
+                                errors.specific_location &&
+                                touched.specific_location &&
+                                "p-invalid pb-1"
+                              }`}
+                            />
+                            <ValidationError
+                              errorBlock={
+                                errors.specific_location &&
+                                touched.specific_location &&
+                                errors.specific_location
+                              }
+                            />
+                          </div>
+                    )}
                     {/* Common part start */}
                     {
                       (values.toggleSwitches[0] ||
@@ -683,7 +737,7 @@ export default function PublicExternal() {
                                   labelProps: {
                                     text: translate(localeJson, 'c_postal_code'),
                                     inputLabelClassName: "block",
-                                    spanText: "*",
+                                    spanText: "",
                                     inputLabelSpanClassName: "p-error"
                                   },
                                   maxLength: 7,
@@ -755,7 +809,7 @@ export default function PublicExternal() {
                                   text: translate(localeJson, 'prefecture_places'),
                                   inputDropdownLabelClassName: "block",
                                   inputDropdownLabelSpanClassName: "p-error",
-                                  spanText: "*"
+                                  spanText: ""
                                 },
                                 inputDropdownClassName: "w-full",
                                 className: "w-full",
