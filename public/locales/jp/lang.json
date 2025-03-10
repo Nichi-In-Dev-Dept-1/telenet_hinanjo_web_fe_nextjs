@@ -701,7 +701,7 @@
       "shelter_question": "食糧等の支援物資を受け取りに行く避難所を選択してください。",
       "enter_current_address": "現住所（住民票に記載されている住所）を入力してください。",
       "mail_address_for_reference": "メールアドレス（情報の修正について）",
-      "out_side_city_question": "質問2. 具体的な場所は？（自宅、親戚宅、車中泊 等）",
+      "out_side_city_question": "具体的な場所は？（自宅、親戚宅、車中泊 等）",
       "within_city": "市内",
       "city_outskirts": "市外",
       "outside_prefecture": "県外",
