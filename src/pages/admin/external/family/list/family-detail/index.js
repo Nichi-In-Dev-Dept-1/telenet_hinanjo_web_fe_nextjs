@@ -180,6 +180,24 @@ export default function EventFamilyDetail() {
                                 </> }        
                                     
                                       </>}
+                                      {
+                                        (externalEvacuee?.place_category == 2 || externalEvacuee?.place_category == 3) &&
+                                        <>
+                                         <div className="">
+                                        <div className=" flex_row_space_between">
+                                          <label className="header_table">
+                                            {translate(
+                                              localeJson,
+                                              "place_detail"
+                                            )}
+                                          </label>
+                                        </div>
+                                        <div className="body_table">
+                                          {externalEvacuee?.place_detail ||"-" }
+                                        </div>
+                                      </div>
+                                        </>
+                                      }
                         <div className="">
                                         <div className=" flex_row_space_between">
                                           <label className="header_table">
