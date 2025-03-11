@@ -249,7 +249,7 @@ export default function EventFamilyDetail() {
                                             type: "button",
                                             rounded: "true",
                                             delete: true,
-                                            buttonClass: "w-10rem export-button",
+                                            buttonClass: "export-button",
                                             // disabled:isReg,
                                             text: translate(localeJson, 'delete_confirm'),
                                             severity: "primary",
