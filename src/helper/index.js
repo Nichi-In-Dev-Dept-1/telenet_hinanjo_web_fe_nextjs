@@ -4,6 +4,7 @@ import { isObject, isArray } from "lodash";
 import { Button } from "@/components";
 // import _ from 'lodash';
 import { prefectures, prefecturesCombined, prefectures_en } from '@/utils/constant';
+import { QRCodeCreateServices } from "@/services";
 
 
 const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
@@ -283,9 +284,36 @@ export const timestampFile = (fileName) => {
  * @param zipURL
  */
 export const zipDownloadWithURL = async(zipURL) => {
-    if (zipURL) {
-        window.open(zipURL, "_blank");
-    }
+
+
+  // Fetch the PDF as a Blob
+  const payload = {
+    url: zipURL,
+  };
+  
+  try {
+    const response = QRCodeCreateServices.callPdfDownload(payload,(res)=>{
+    let date = getYYYYMMDDHHSSSSDateTimeFormat(new Date())
+          // Ensure the response is treated as a binary Blob
+    const blob = new Blob([res.data], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+  
+    // Create a download link
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `QR-${date}.pdf`; // Download filename
+    document.body.appendChild(link);
+    link.click();
+  
+    // Cleanup
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    });
+  } catch (error) {
+    console.error("Axios POST error:", error);
+  }
+  
+ 
 };
 
 
