@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useRouter } from "next/router";
 
-import { Button } from "@/components";
+import { Button, CommonDialog } from "@/components";
 import { LayoutContext } from "@/layout/context/layoutcontext";
 import { getValueByKeyRecursively as translate } from "@/helper";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
@@ -12,10 +12,52 @@ const RegisterSuccess = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const regReducer = useAppSelector((state) => state.registerReducer);
+  const [confirm, setConfirm] = useState(false);
 
   const family_code = regReducer.successData?.data?.familyCode
   
   return (
+
+    <>
+     <CommonDialog
+                    open={confirm}
+                    dialogBodyClassName="p-3 text-center"
+                    header={translate(localeJson, 'barcode_dialog_btn_label')}
+                    content={translate(localeJson, 'return_home_message')}
+                    position={"center"}
+                    footerParentClassName={"text-center pt-5"}
+                    footerButtonsArray={[
+                        {
+                            buttonProps: {
+                                buttonClass: "back-button w-full",
+                                text: translate(localeJson, "no"),
+                                onClick: () => {
+                                  setConfirm(false);
+                                },
+                            },
+                            parentClass: "back-button block"
+                        },
+                        {
+                            buttonProps: {
+                                buttonClass: "mt-2 w-full",
+                                type: "submit",
+                                text: translate(localeJson, "yes"),
+                                onClick: () => {
+                                  localStorage.setItem("personCount", null);
+                                  localStorage.setItem("isCamera", "false");
+                                  localStorage.setItem("isScanner", "false");
+                                  dispatch(reset())
+                                  router.push('/user/register/member')
+                                    
+                                },
+                            },
+                            parentClass: "block"
+                        }
+                    ]}
+                    close={() => {
+                      setConfirm(false);
+                    }}
+                />
     <div className='grid flex-1'>
       <div className='col-12 flex-1'>
         <div className='card flex flex-column h-full align-items-center justify-content-center'>
@@ -39,11 +81,7 @@ const RegisterSuccess = () => {
                 buttonClass: "w-full back-button h-5rem border-radius-5rem",
                 text: translate(localeJson, 'return_home'),
                 onClick: () => {
-                  localStorage.setItem("personCount", null);
-                  localStorage.setItem("isCamera", "false");
-                  localStorage.setItem("isScanner", "false");
-                  dispatch(reset())
-                  router.push('/user/register/member')
+                  setConfirm(true);
                 },
               }} parentClass={"back-button"}
               />
@@ -52,6 +90,7 @@ const RegisterSuccess = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
