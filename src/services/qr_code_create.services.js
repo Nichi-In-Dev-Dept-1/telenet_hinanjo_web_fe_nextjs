@@ -6,7 +6,8 @@ export const QRCodeCreateServices = {
     callImport: _callImport,
     callDelete: _callDelete,
     callZipDownload: _callZipDownload,
-    callBatchDownload: _callBatchDownload
+    callBatchDownload: _callBatchDownload,
+    callPdfDownload: _callPdfDownload
 };
 
 /**
@@ -95,5 +96,20 @@ function _callBatchDownload(payload,callBackFun) {
             localStorage.setItem('batch_id','');
             callBackFun(false);
             toastDisplay(error?.response);  
+        });
+}
+
+function _callPdfDownload(payload,callBackFun) {
+    axios.post('/user/download',payload, {
+        responseType: 'blob', // Ensure binary data is handled properly
+    })
+        .then((response) => {
+            if (response && response.data) {
+                callBackFun(response);
+            }
+        })
+        .catch((error) => {
+            callBackFun(false);
+            toastDisplay(error?.response);
         });
 }

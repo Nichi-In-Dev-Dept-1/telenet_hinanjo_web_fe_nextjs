@@ -1095,5 +1095,9 @@
     "company_name_max_length":"The company name can be up to 25 characters.",
      "project_name":"System Name",
     "project_name_max_length":"The System name can be up to 25 characters.",
-     "qr_import_success":"We have started creating your QR code. You will be notified when it is ready to download."
+     "qr_import_success":"We have started creating your QR code. You will be notified when it is ready to download.",
+    "c_card_reg_ivu": "My Number Card/Driver's license",
+    "c_card_reg_ivu_msg": "My Number or driver's license cards can be used.",
+    "return_home_message":"Returning to the home page. Have you recorded the register number?",
+     "next_button_text":"Next"
 }
