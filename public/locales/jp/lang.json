@@ -1091,5 +1091,9 @@
       "company_name_max_length":"会社名は25文字までです。",
       "project_name":"システム名",
       "project_name_max_length":"システム名は25文字までです。",
-      "qr_import_success":"QRコードの作成を開始しました。ダウンロード可能になりましたら通知メッセージが表示されます。"
+      "qr_import_success":"QRコードの作成を開始しました。ダウンロード可能になりましたら通知メッセージが表示されます。",
+      "c_card_reg_ivu": "マイナンバーカード／免許証",
+      "c_card_reg_ivu_msg": "マイナンバーカード／免許証カードが使用可能です。",
+      "return_home_message":"ホームに戻ります。管理番号は記録しましたか？ ",
+      "next_button_text":"次へ進む"
 }
