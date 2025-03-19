@@ -208,7 +208,7 @@ export default function Admission() {
 
   const getSearchResult = (res) => {
     if (res?.success && !_.isEmpty(res?.data)) {
-      const data = res.data.model;
+      const data = res.data;
       const count = res.data.count||"";
       if(count == 1){
       setSearchResult(data);

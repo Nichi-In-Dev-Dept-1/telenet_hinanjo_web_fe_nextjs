@@ -8,6 +8,7 @@ import { ButtonRounded, FamilyListComponent } from "@/components";
 import { useAppDispatch } from "@/redux/hooks";
 import { reset } from "@/redux/check_in";
 import { CheckInOutServices } from "@/services";
+import EvacueeFamilyDetailHistory from "@/components/familySearchDetailsHistory";
 
 const SearchDetails = () => {
   const { locale, localeJson, setLoader } = useContext(LayoutContext);
@@ -18,7 +19,7 @@ const SearchDetails = () => {
 
   let data = checkInReducer?.checkInData || [];
 
-  let family_id = data.length > 0 ? data[0].family_id : "";
+  let family_id = data?.data?.length > 0 ? data?.data[0].family_id : "";
 
   const [familyCode, setFamilyCode] = useState(family_id);
 
@@ -30,11 +31,16 @@ const SearchDetails = () => {
   }
 
   return (
-    <div className="flex justify-content-center">
-      <div className="m-2 w-full xlScreenMaxWidth mdScreenMaxWidth">
-        {data?.length > 0 && (
+    // <div className="flex justify-content-center">
+    //   <div className="m-2 w-full xlScreenMaxWidth mdScreenMaxWidth">
+    <div>
+    <div className="grid">
+      <div className="col-12">
+        <div className="card">
+        {data?.data?.length > 0 && (
           <>
-            <FamilyListComponent data={data} header={translate(localeJson, "reg_confirm")} />
+           <EvacueeFamilyDetailHistory data={data} header={translate(localeJson, "reg_confirm")} > </EvacueeFamilyDetailHistory>
+            {/* <FamilyListComponent data={data} header={translate(localeJson, "reg_confirm")} /> */}
             <div className="flex flex-column justify-content-center align-items-center">
               <div className="w-12 lg:w-6">
                 <ButtonRounded
@@ -75,9 +81,11 @@ const SearchDetails = () => {
             </div>
           </>
         )}
+        </div></div>
+    </div></div>
 
-      </div>
-    </div>
+    //   </div>
+    // </div>
   );
 };
 
