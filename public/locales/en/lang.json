@@ -1099,5 +1099,14 @@
     "c_card_reg_ivu": "My Number Card/Driver's license",
     "c_card_reg_ivu_msg": "My Number or driver's license cards can be used.",
     "return_home_message":"Returning to the home page. Have you recorded the register number?",
-     "next_button_text":"Next"
+     "next_button_text":"Next",
+      "title": ". Evacuation and Damage Information",
+    "houseCondition": ". Please provide the requested information related to evacuation and damage.",
+    "title_policy": "Checks on the Handling of Personal Information",
+    "agreePolicy": ". Please agree to the handling of personal information to proceed.",
+    "publicNotice": ". If you wish to make your presence at this shelter public, please select the checkbox.",
+    "guide":"guide",
+    "guide_message":"Make sure that the scanned content is reflected on the screen, and if you need to make corrections, correct them.If there are no problems, select or enter the following items and proceed to the confirmation screen.",
+    "plusTek_scan_msg":"Place the keep the card as shown in the sample image below and press the Scan button.",
+    "scan":"Scan"
 }

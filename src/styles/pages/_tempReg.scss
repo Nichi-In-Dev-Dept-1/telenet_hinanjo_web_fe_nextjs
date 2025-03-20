@@ -60,3 +60,57 @@
 .h-40 {
     height: 40px;
   }
+
+/* Container with Moving Dotted RGB Border */
+.animation_end {
+  padding: 20px;
+  margin: 40px auto;
+  position: relative;
+  font-family: Arial;
+  color: black;
+  text-align: left;
+}
+
+.animation_end .svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.animation_end rect {
+  stroke-dasharray: 1, 1; /* Dashed border pattern */
+  stroke-width: 2;          /* Border thickness */
+  stroke: #ff6f61;          /* Border color */
+  animation:  colorAnimation 3s linear infinite; /* Animation loop */
+}
+
+  /* RGB color changing animation */
+  @keyframes colorAnimation {
+    0% { stroke: rgb(255, 0, 0); }   /* Red */
+    33% { stroke: rgb(0, 255, 0); }  /* Green */
+    66% { stroke: rgb(0, 0, 255); }  /* Blue */
+    100% { stroke: rgb(255, 0, 0); } /* Back to Red */
+  }
+
+
+
+  
+  .blinking-red {
+    color: #FF0000;
+    font-weight: bold;
+    animation: blink 1s linear infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.w-35rem {
+  width: 35rem;
+}
+
+  

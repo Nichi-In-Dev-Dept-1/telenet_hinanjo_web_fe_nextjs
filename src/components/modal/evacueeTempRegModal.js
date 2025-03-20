@@ -25,7 +25,8 @@ import {
   InputNumber,
   QuestionList,
   QrScannerModal,
-  CustomHeader
+  CustomHeader,
+  CommonDialog
 } from "@/components";
 import {
   prefectures,
@@ -158,6 +159,7 @@ export default function EvacueeTempRegModal(props) {
     getSpecialCareDetails,
     qrScanRegistration,
     ocrScanRegistration,
+    ivuToolRegistration
   } = TempRegisterServices;
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [count, setCounter] = useState(1);
@@ -190,7 +192,8 @@ export default function EvacueeTempRegModal(props) {
   const [initialQuestion, setInitialQues] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [specialCare, setSpecialCare] = useState([]);
-  const [prefCount, setPrefCount] = useState(1)
+  const [prefCount, setPrefCount] = useState(1);
+  // const [confirm, setConfirm] = useState(false);
   useEffect(() => {
     fetchMasterQuestion();
     fetchSpecialCare();
@@ -458,8 +461,25 @@ export default function EvacueeTempRegModal(props) {
     });
   };
 
+  const ivuResult = () => {
+    setLoader(true);
+    let payload = {
+      client_url:"http://10.8.0.6:50080"
+    }
+    ivuToolRegistration(payload, (res) => {
+      if (res) {
+        const evacueeArray = res.data.data;
+        formikRef.current.resetForm();
+        createEvacuee(evacueeArray, formikRef.current.setFieldValue);
+        setLoader(false);
+      } else {
+        setLoader(false);
+      }
+    });
+  }
+
   async function createEvacuee(evacuees, setFieldValue) {
-    if (!evacuees.prefecture_id || !evacuees.postal_code) {
+    if (!evacuees.prefecture_id || !evacuees.postal_code ) {
       let address = extractAddress(evacuees.fullAddress) || extractAddress(evacuees.address);
 
       try {
@@ -545,6 +565,9 @@ export default function EvacueeTempRegModal(props) {
   const Card = {
     url: "/layout/images/evacuee-card.png",
   };
+  // const ScannerImage = {
+  //   url:"/layout/images/scanImage.jpg",
+  // }
 
   const handleConfirmation = () => {
     const message = translate(localeJson, "person_count_error");
@@ -764,6 +787,37 @@ export default function EvacueeTempRegModal(props) {
 
   return (
     <>
+         {/* <CommonDialog
+                    open={confirm}
+                    dialogClassName="w-35rem overflow-auto"
+                    dialogBodyClassName="p-3 text-left "
+                    header={translate(localeJson, 'barcode_dialog_btn_label')}
+                    content={
+                       <div className="text-center">
+                            <p className=""> {translate(localeJson, 'plusTek_scan_msg')}</p>
+                            <p><img src={ScannerImage.url} width={400} height={400} /></p>
+                        </div>
+                     }
+                    position={"center"}
+                    footerParentClassName={"text-center pt-5"}
+                    footerButtonsArray={[
+                        {
+                            buttonProps: {
+                                buttonClass: "mt-2 w-full",
+                                type: "submit",
+                                text: translate(localeJson, "scan"),
+                                onClick: () => {
+                                  setConfirm(false);
+                                  handleScan()
+                                },
+                            },
+                            parentClass: "block"
+                        }
+                    ]}
+                    close={() => {
+                      setConfirm(false);
+                    }}
+                /> */}
       <QrConfirmDialog 
        visible={visible}
        setVisible={setVisible}
@@ -887,7 +941,7 @@ export default function EvacueeTempRegModal(props) {
                         buttonClass:
                           "w-full primary-button h-3rem border-radius-5rem mb-3",
                         type: "button",
-                        text: buttonText,
+                        text: translate(localeJson, "next_button_text"),
                         onClick: async () => {
                           // Setting the form as submitted
                           setIsFormSubmitted(true);
@@ -975,7 +1029,7 @@ export default function EvacueeTempRegModal(props) {
                           }
                         />
                         <div>
-                          <Tooltip target=".custom-target-icon" position="top" content={translate(localeJson, "ocr_tooltip")} className="shadow-none" />
+                          <Tooltip target=".custom-target-icon" position="bottom" content={translate(localeJson, "ocr_tooltip")} className="shadow-none" />
                           <i className="custom-target-icon pi pi-info-circle"></i>
                         </div>
                       </div>
@@ -1014,6 +1068,31 @@ export default function EvacueeTempRegModal(props) {
                         </div>
                         
                         </div>
+                        { window.location.pathname.startsWith('/user/register') && 
+                          (
+                        <div className="flex items-center">
+                        <ButtonRounded
+                          buttonProps={{
+                            type: "button",
+                            rounded: "true",
+                            custom: "",
+                            buttonClass:
+                              "back-button w-full h-3rem border-radius-5rem custom-icon-button flex justify-content-center p-2",
+                            text: translate(localeJson, "c_card_reg_ivu"),
+                            icon: <img src={Card.url} width={30} height={30} />,
+                            onClick: () => {
+                              ivuResult();
+                            },
+                          }}
+                          parentClass={
+                            "back-button  w-full flex justify-content-center p-2 pr-0 mb-2"
+                          }
+                        />
+                        <div>
+                          <Tooltip target=".custom-target-icon-3" position="bottom" content={translate(localeJson, "c_card_reg_ivu_msg")} className="shadow-none" />
+                          <i className="custom-target-icon-3 pi pi-info-circle"></i>
+                        </div>
+                      </div>)}
                     </div>
                     <div className="pl-5 pr-5">
                       <div className="mb-2 col-12">
