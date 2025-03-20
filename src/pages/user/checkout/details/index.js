@@ -8,6 +8,7 @@ import { ButtonRounded, FamilyListComponent } from "@/components";
 import { useAppDispatch } from "@/redux/hooks";
 import { reset } from "@/redux/checkout";
 import { CheckInOutServices } from "@/services";
+import EvacueeFamilyDetailHistory from "@/components/familySearchDetailsHistory";
 
 const CheckOutDetails = () => {
   const { localeJson, setLoader } = useContext(LayoutContext);
@@ -17,7 +18,7 @@ const CheckOutDetails = () => {
 
   let data = checkOutReducer?.checkOutData || [];
 
-  let family_id = data.length > 0 ? data[0].family_id : "";
+  let family_id = data?.data?.length > 0 ? data?.data[0]?.family_id : "";
 
   const [familyCode, setFamilyCode] = useState(family_id);
 
@@ -45,11 +46,16 @@ const CheckOutDetails = () => {
   }
 
   return (
-    <div className="flex justify-content-center">
-      <div className="m-2 w-12 xlScreenMaxWidth mdScreenMaxWidth">
-        {data?.length > 0 && (
+    // <div className="flex justify-content-center">
+    //   <div className="m-2 w-12 xlScreenMaxWidth mdScreenMaxWidth">
+    <div>
+    <div className="grid">
+      <div className="col-12">
+        <div className="card">
+        {data?.data?.length > 0 && (
           <>
-            <FamilyListComponent data={data} header={translate(localeJson, "checkout_confirm")} />
+            <EvacueeFamilyDetailHistory data={data} header={translate(localeJson, "reg_confirm")} > </EvacueeFamilyDetailHistory>
+            {/* <FamilyListComponent data={data} header={translate(localeJson, "checkout_confirm")} /> */}
             <div className="flex flex-column justify-content-center align-items-center">
               <div className="w-12 lg:w-6">
                 <ButtonRounded
@@ -59,7 +65,7 @@ const CheckOutDetails = () => {
                     rounded: "true",
                     text: translate(localeJson, "exit_Button"),
                     onClick: () => {
-                      doCheckout(data[0].place_id)
+                      doCheckout(data?.data[0]?.place_id)
                     }
                   }}
                   parentClass={"w-full primary-button"}
@@ -85,8 +91,12 @@ const CheckOutDetails = () => {
             </div>
           </>
         )}
+        </div>
       </div>
     </div>
+    </div>
+    //   {/* </div>
+    // </div> */}
   );
 };
 

@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import { gender_en, gender_jp } from '@/utils/constant';
-import { convertToSingleByte, getJapaneseDateTimeDisplayActualFormat, toastDisplay, getValueByKeyRecursively as translate } from '@/helper'
+import { convertToSingleByte, getEnglishDateSlashDisplayFormat, getJapaneseDateTimeDisplayActualFormat, toastDisplay, getValueByKeyRecursively as translate } from '@/helper'
 import { LayoutContext } from "@/layout/context/layoutcontext";
 import { CheckInOutServices, TempRegisterServices, UserPlaceListServices, UserDashboardServices, CommonServices } from "@/services";
 import { useAppDispatch } from "@/redux/hooks";
@@ -106,7 +106,7 @@ export default function Admission() {
 
   const getSearchResult = (res) => {
     if (res?.success && !_.isEmpty(res?.data)) {
-      const data = res.data.model;
+      const data = res.data;
       const count = res.data.count||"";
       if(count == 1){
       setSearchResult(data);
@@ -387,17 +387,21 @@ export default function Admission() {
         onSubmit={(values) => {
           let fam_val = values.familyCode ? convertToSingleByte(values.familyCode) : "";
           let fam_pass = values.password ? convertToSingleByte(values.password) : "";
-          let payload = {
-            family_code: values.familyCode ? fam_val : "",
-            refugee_name: values.name,
-            password: fam_pass,
-            place_id: layoutReducer?.user?.place?.id,
-            ...(layoutReducer?.user?.place?.type === "place"
-              ? { place_id: layoutReducer?.user?.place?.id }
-              : layoutReducer?.user?.place?.type === "event"
-                ? { event_id: layoutReducer?.user?.place?.id }
-                : {}),
-          };
+          let tel = values.tel ? convertToSingleByte(values.tel) : "";
+            let payload = {
+                        family_code: values.familyCode ? fam_val : "",
+                        refugee_name: values.name,
+                        password: fam_pass,
+                        tel:tel,
+                        dob:values.dob?getEnglishDateSlashDisplayFormat(values.dob):"",
+                        gender: values.gender,
+                        place_id: layoutReducer?.user?.place?.id,
+                        ...(layoutReducer?.user?.place?.type === "place"
+                          ? { place_id: layoutReducer?.user?.place?.id }
+                          : layoutReducer?.user?.place?.type === "event"
+                            ? { event_id: layoutReducer?.user?.place?.id }
+                            : {}),
+                      };
           if (isSearch) {
             setLoader(true);
             getList(payload, getSearchResult);
