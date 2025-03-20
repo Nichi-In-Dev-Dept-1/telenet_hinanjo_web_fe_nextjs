@@ -35,6 +35,7 @@ import {
   CustomHeader,
   BarcodeDialog,
   QrScannerModal,
+  CommonDialog,
 } from "@/components";
 import EvacueeTempRegModal from "@/components/modal/evacueeTempRegModal";
 import { prefectures, prefectures_en } from "@/utils/constant";
@@ -96,6 +97,8 @@ export default function Admission() {
   const formikRef = useRef();
   const [QrScanPopupModalOpen, setQrScanPopupModalOpen] = useState(false);
   const [visible, setVisible] = useState(false);
+  // const [showAnimation, setShowAnimation] = useState(false);
+  // const [modalMessageFlag, setModalMessageFlag] = useState(true);
 
   const toggleExpansion = (personId) => {
     setExpandedFamilies((prevExpanded) =>
@@ -118,6 +121,7 @@ export default function Admission() {
     getMasterQuestionnaireList,
     ocrScanRegistration,
     qrScanRegistration,
+    ivuToolRegistration
   } = TempRegisterServices;
 
 
@@ -336,6 +340,17 @@ const handleScan = async () => {
       }
     }
   }, [evacueeCount]);
+
+  // useEffect(()=>{
+  //   setTimeout(()=>{
+  //   if(evacueeCount>0 && evacuee?.length >0 && (!modalCountFlag||evacueeCount==personCount) && modalMessageFlag)
+  //   {
+  //     setShowAnimation(true);
+  //   }
+  // else{
+  //   setShowAnimation(false);
+  // }},1000);
+  // },[evacueeCount,modalCountFlag])
 
   useEffect(() => {
     fetchMasterQuestion();
@@ -606,6 +621,10 @@ const handleScan = async () => {
     url: "/layout/images/deleteIcon.svg",
   };
 
+  // const ScannerImage = {
+  //   url:"/layout/images/scanImage.jpg",
+  // }
+
   const genderOptions = [
     { name: translate(localeJson, "c_male"), value: 1 },
     { name: translate(localeJson, "c_female"), value: 2 },
@@ -832,6 +851,54 @@ const handleScan = async () => {
     });
   };
 
+  const ivuResult = async () => {
+    setLoader(true);
+    let payload = {
+      client_url:"http://10.8.0.6:50080"
+    }
+    ivuToolRegistration(payload, async (res) => {
+      if (res) {
+        const evacueeArray = res.data.data;
+        let newEvacuee = createEvacuee(evacueeArray);
+        newEvacuee = {
+          ...newEvacuee,
+          isFromFormReader: true
+        };
+        if (!newEvacuee.postalCode || !evacueeArray.prefecture_id) {
+          const address = evacueeArray.fullAddress || evacueeArray.address;
+          try {
+            const { prefecture, postalCode, prefecture_id } = await geocodeAddressAndExtractData(address, localeJson, locale, setLoader);
+
+            // Update newEvacuee with geocoding data
+            newEvacuee = {
+              ...newEvacuee,
+              postalCode: postalCode,
+              prefecture_id: prefecture_id
+            };
+          } catch (error) {
+            console.error("Error fetching geolocation data:", error);
+          }
+        }
+        setEditObj(newEvacuee)
+        setRegisterModalAction("edit");
+        setSpecialCareEditOpen(true);
+        setEvacuee((prev) => {
+          return [
+            ...prev, // Use spread operator to include previous items in the array
+            newEvacuee, // Add the newEvacuee to the array
+          ];
+        });
+        formikRef.current.setFieldValue("evacuee", [
+          ...formikRef.current.values.evacuee,
+          newEvacuee,
+        ]);
+        setLoader(false);
+      } else {
+        setLoader(false);
+      }
+    });
+  };
+
   const handleRecordingStateChange = (isRecord) => {
     setMIsRecording(isRecord);
     setIsRecording(isRecord);
@@ -956,22 +1023,22 @@ const handleScan = async () => {
     const boundObject = {
       id: id,
       checked: checked,
-      name: evacuees ? evacuees.name || "" : "",
+      name: evacuees ? evacuees?.name || "" : "",
       name_furigana: evacuees
-        ? evacuees.refugeeName || evacuees.refugee_name || ""
+        ? evacuees?.refugeeName || evacuees?.refugee_name || ""
         : "",
       dob: evacuees ? evacuees.dob != "1900/01/01" ? convertedObject || "" : "" : "",
       age: evacuees ? evacuees.dob != "1900/01/01" ? age.years || "" : "" : "",
       age_m:
         evacuees && evacuees.dob != "1900/01/01" ? age.months !== undefined ? age.months : "" : "",
       gender: evacuees ? parseInt(evacuees.gender) || null : null,
-      postalCode: evacuees ? evacuees.postal_code || "" : "",
-      tel: evacuees ? evacuees.tel || "" : "",
-      prefecture_id: evacuees ? evacuees.prefecture_id || "" : "",
+      postalCode: evacuees ? evacuees?.postal_code || "" : "",
+      tel: evacuees ? evacuees?.tel || "" : "",
+      prefecture_id: evacuees ? evacuees?.prefecture_id || "" : "",
       address: evacuees ? evacuees.address?extractAddress(evacuees.address):"" || "" : "",
       // address2: evacuees ? evacuees.address2 || "" : "",
       specialCareType: null,
-      connecting_code: evacuees ? evacuees.connecting_code || "" : "",
+      connecting_code: evacuees ? evacuees?.connecting_code || "" : "",
       remarks: "",
       individualQuestions: null,
       telAsRep: false,
@@ -1036,6 +1103,25 @@ const handleScan = async () => {
 
   return (
     <>
+    {/* <CommonDialog
+  open={showAnimation}
+  dialogBodyClassName="p-3 text-center"
+  header={translate(localeJson, 'barcode_dialog_btn_label')}
+  position="center"
+  footerParentClassName="text-center pt-5"
+  content={
+    <div className="text-left">
+      <p className="">{translate(localeJson, 'guide_message')}</p>
+      <p>{translate(localeJson, 'title')}</p>
+      <p>{translate(localeJson, 'title_policy')}</p>
+    </div>
+  }
+  footerButtonsArray={[]}
+  close={() =>{ setShowAnimation(false);
+    setModalMessageFlag(false);
+  }}
+/> */}
+
       <QrScannerModal
         open={openQrPopup}
         close={closeQrPopup}
@@ -1223,6 +1309,35 @@ const handleScan = async () => {
                               <div>{translate(localeJson, "qr_scan_message2")}</div>
                             </></Tooltip>
                           <i className="custom-target-icon-2 pi pi-info-circle"></i>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <ButtonRounded
+                          buttonProps={{
+                            type: "button",
+                            rounded: "true",
+                            custom: "",
+                            buttonClass:
+                              "back-button h-4rem border-radius-5rem w-full custom-icon-button flex justify-content-center",
+                            text: translate(localeJson, "c_card_reg_ivu"),
+                            icon: <img src={Card.url} width={30} height={30} />,
+                            onClick: () => {
+                              ivuResult();
+                             
+                            },
+                          }}
+                          parentClass={
+                            " back-button  w-full flex justify-content-center p-2 pr-0 mb-2"
+                          }
+                        />
+                        <div>
+                          <Tooltip
+                            target=".custom-target-icon-3"
+                            position="bottom"
+                            content={translate(localeJson, "c_card_reg_ivu_msg")}
+                            className="shadow-none"
+                          />
+                          <i className="custom-target-icon-3 pi pi-info-circle"></i>
                         </div>
                       </div>
                     </div>

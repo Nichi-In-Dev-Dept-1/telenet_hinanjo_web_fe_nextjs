@@ -24,6 +24,7 @@ export const TempRegisterServices = {
   deleteTempFamily: _deleteTempFamily,
   isRegistered: _isRegistered,
   tempDetails: _tempDetails,
+  ivuToolRegistration: _ivuToolRegistration,
 };
 
 function _getDefaultEventData(callBackFun) {
@@ -328,4 +329,23 @@ function _tempDetails(payload, callBackFun) {
       callBackFun();
       toastDisplay(error?.response);
     });
+}
+
+
+/**
+ * Get my number card detail
+ * @param {*} payload 
+ * @param {*} callBackFun 
+ */
+function _ivuToolRegistration(payload, callBackFun) {
+  axios.post('/user/ivu/api', payload)
+      .then((response) => {
+          if (response) {
+              callBackFun(response);
+          }
+      })
+      .catch((error) => {
+          callBackFun(false);
+          toastDisplay(error?.response);
+      });
 }
