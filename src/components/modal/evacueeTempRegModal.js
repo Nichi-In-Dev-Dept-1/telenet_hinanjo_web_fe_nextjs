@@ -788,7 +788,7 @@ export default function EvacueeTempRegModal(props) {
 
   return (
     <>
-          <CommonDialog
+          {/* <CommonDialog
                     open={confirm}
                     dialogClassName="w-35rem overflow-auto"
                     dialogBodyClassName="p-3 text-left "
@@ -829,7 +829,7 @@ export default function EvacueeTempRegModal(props) {
                     close={() => {
                       setConfirm(false);
                     }}
-                /> 
+                />  */}
       <QrConfirmDialog 
        visible={visible}
        setVisible={setVisible}
@@ -1027,16 +1027,19 @@ export default function EvacueeTempRegModal(props) {
                             text: translate(localeJson, "c_card_reg"),
                             icon: <img src={Card.url} width={30} height={30} />,
                             onClick: () => {
-                              if(selectedScanner)
-                              {
-                                if(skipStep)
-                                {
-                                  handleScan()
-                                }
-                                else {
-                                setConfirm(true)
-                                }
-                                // handleScan()
+                              // if(selectedScanner)
+                              // {
+                              //   if(skipStep)
+                              //   {
+                              //     handleScan()
+                              //   }
+                              //   else {
+                              //   setConfirm(true)
+                              //   }
+                              //   // handleScan()
+                              // }
+                              if(selectedScanner){
+                                handleScan();
                               }
                               else {
                               setPerspectiveCroppingVisible(true);
@@ -1087,7 +1090,7 @@ export default function EvacueeTempRegModal(props) {
                         </div>
                         
                         </div>
-                        { window.location.pathname.startsWith('/user/register') && 
+                        { (window.location.pathname.startsWith('/user/register') &&(window.location.origin === "https://hitachi.nichi.in" || window.location.origin === "http://localhost:3000" )) && 
                           (
                         <div className="flex items-center">
                         <ButtonRounded
