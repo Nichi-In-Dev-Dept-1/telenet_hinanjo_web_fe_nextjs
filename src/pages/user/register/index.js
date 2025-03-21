@@ -341,16 +341,16 @@ const handleScan = async () => {
     }
   }, [evacueeCount]);
 
-  useEffect(()=>{
-    setTimeout(()=>{
-    if(evacueeCount>0 && evacuee?.length >0 && (!modalCountFlag||evacueeCount==personCount) && modalMessageFlag)
-    {
-      setShowAnimation(true);
-    }
-  else{
-    setShowAnimation(false);
-  }},1000);
-  },[evacueeCount,modalCountFlag])
+  // useEffect(()=>{
+  //   setTimeout(()=>{
+  //   if(evacueeCount>0 && evacuee?.length >0 && (!modalCountFlag||evacueeCount==personCount) && modalMessageFlag)
+  //   {
+  //     setShowAnimation(true);
+  //   }
+  // else{
+  //   setShowAnimation(false);
+  // }},1000);
+  // },[evacueeCount,modalCountFlag])
 
   useEffect(() => {
     fetchMasterQuestion();
@@ -1311,6 +1311,8 @@ const handleScan = async () => {
                           <i className="custom-target-icon-2 pi pi-info-circle"></i>
                         </div>
                       </div>
+                      { (window.location.pathname.startsWith('/user/register') &&(window.location.origin === "https://hitachi.nichi.in" || window.location.origin === "http://localhost:3000" )) && 
+                          (
                       <div className="flex items-center">
                         <ButtonRounded
                           buttonProps={{
@@ -1339,7 +1341,7 @@ const handleScan = async () => {
                           />
                           <i className="custom-target-icon-3 pi pi-info-circle"></i>
                         </div>
-                      </div>
+                      </div>)}
                     </div>
                     <div className="mt-3">
                       <div className="grid">
