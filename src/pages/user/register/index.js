@@ -97,8 +97,8 @@ export default function Admission() {
   const formikRef = useRef();
   const [QrScanPopupModalOpen, setQrScanPopupModalOpen] = useState(false);
   const [visible, setVisible] = useState(false);
-  // const [showAnimation, setShowAnimation] = useState(false);
-  // const [modalMessageFlag, setModalMessageFlag] = useState(true);
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [modalMessageFlag, setModalMessageFlag] = useState(true);
 
   const toggleExpansion = (personId) => {
     setExpandedFamilies((prevExpanded) =>
@@ -1106,7 +1106,7 @@ const handleScan = async () => {
     {/* <CommonDialog
   open={showAnimation}
   dialogBodyClassName="p-3 text-center"
-  header={translate(localeJson, 'barcode_dialog_btn_label')}
+  header={translate(localeJson, 'guide')}
   position="center"
   footerParentClassName="text-center pt-5"
   content={
@@ -1311,6 +1311,7 @@ const handleScan = async () => {
                           <i className="custom-target-icon-2 pi pi-info-circle"></i>
                         </div>
                       </div>
+                      { window.location.pathname.startsWith('https://hinanjo.nichi.in//user/register') &&(
                       <div className="flex items-center">
                         <ButtonRounded
                           buttonProps={{
@@ -1339,7 +1340,7 @@ const handleScan = async () => {
                           />
                           <i className="custom-target-icon-3 pi pi-info-circle"></i>
                         </div>
-                      </div>
+                      </div>)}
                     </div>
                     <div className="mt-3">
                       <div className="grid">

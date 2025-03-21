@@ -193,7 +193,8 @@ export default function EvacueeTempRegModal(props) {
   const [questions, setQuestions] = useState([]);
   const [specialCare, setSpecialCare] = useState([]);
   const [prefCount, setPrefCount] = useState(1);
-  // const [confirm, setConfirm] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+  const [skipStep,setSkipStep] = useState(false);
   useEffect(() => {
     fetchMasterQuestion();
     fetchSpecialCare();
@@ -565,9 +566,9 @@ export default function EvacueeTempRegModal(props) {
   const Card = {
     url: "/layout/images/evacuee-card.png",
   };
-  // const ScannerImage = {
-  //   url:"/layout/images/scanImage.jpg",
-  // }
+  const ScannerImage = {
+    url:"/layout/images/scanImage.jpg",
+  }
 
   const handleConfirmation = () => {
     const message = translate(localeJson, "person_count_error");
@@ -787,15 +788,26 @@ export default function EvacueeTempRegModal(props) {
 
   return (
     <>
-         {/* <CommonDialog
+          {/* <CommonDialog
                     open={confirm}
                     dialogClassName="w-35rem overflow-auto"
                     dialogBodyClassName="p-3 text-left "
-                    header={translate(localeJson, 'barcode_dialog_btn_label')}
+                    header={translate(localeJson, 'guide')}
                     content={
                        <div className="text-center">
                             <p className=""> {translate(localeJson, 'plusTek_scan_msg')}</p>
                             <p><img src={ScannerImage.url} width={400} height={400} /></p>
+                            <div className="mt-4 flex items-center justify-center">
+          <NormalCheckBox
+            checkBoxProps={{
+              id: "skipStep",
+              value: translate(localeJson, 'skip_this_step_message'),
+              onChange: (e) => setSkipStep(e.checked),
+              checked: skipStep,
+              labelClass: "ml-2"
+            }}
+          />
+        </div>
                         </div>
                      }
                     position={"center"}
@@ -817,7 +829,7 @@ export default function EvacueeTempRegModal(props) {
                     close={() => {
                       setConfirm(false);
                     }}
-                /> */}
+                />  */}
       <QrConfirmDialog 
        visible={visible}
        setVisible={setVisible}
@@ -1015,8 +1027,16 @@ export default function EvacueeTempRegModal(props) {
                             text: translate(localeJson, "c_card_reg"),
                             icon: <img src={Card.url} width={30} height={30} />,
                             onClick: () => {
-                              if(selectedScanner)
-                              {
+                              // if(!selectedScanner)
+                              // {
+                              //   if(skipStep)
+                              //   {
+                              //     handleScan()
+                              //   }
+                              //   else {
+                              //   setConfirm(true)
+                              //   }
+                              if(selectedScanner) {
                                 handleScan()
                               }
                               else {
@@ -1068,7 +1088,7 @@ export default function EvacueeTempRegModal(props) {
                         </div>
                         
                         </div>
-                        { window.location.pathname.startsWith('/user/register') && 
+                        { window.location.pathname.startsWith('https://hinanjo.nichi.in//user/register') && 
                           (
                         <div className="flex items-center">
                         <ButtonRounded
