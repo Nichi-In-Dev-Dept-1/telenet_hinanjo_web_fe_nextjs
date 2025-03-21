@@ -341,16 +341,19 @@ const handleScan = async () => {
     }
   }, [evacueeCount]);
 
-  // useEffect(()=>{
-  //   setTimeout(()=>{
-  //   if(evacueeCount>0 && evacuee?.length >0 && (!modalCountFlag||evacueeCount==personCount) && modalMessageFlag)
-  //   {
-  //     setShowAnimation(true);
-  //   }
-  // else{
-  //   setShowAnimation(false);
-  // }},1000);
-  // },[evacueeCount,modalCountFlag])
+  useEffect(()=>{
+    setTimeout(()=>{
+    if(evacueeCount>0 && evacuee?.length >0 && (!modalCountFlag||evacueeCount==personCount) && modalMessageFlag)
+    {
+      if(regReducer.originalData?.length <= 0)
+      {
+      setShowAnimation(true);
+      }
+    }
+  else{
+    setShowAnimation(false);
+  }},1000);
+  },[evacueeCount,modalCountFlag])
 
   useEffect(() => {
     fetchMasterQuestion();
@@ -1325,6 +1328,7 @@ const handleScan = async () => {
                             icon: <img src={Card.url} width={30} height={30} />,
                             onClick: () => {
                               ivuResult();
+                             
                             },
                           }}
                           parentClass={
