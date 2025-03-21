@@ -1027,7 +1027,7 @@ export default function EvacueeTempRegModal(props) {
                             text: translate(localeJson, "c_card_reg"),
                             icon: <img src={Card.url} width={30} height={30} />,
                             onClick: () => {
-                              if(!selectedScanner)
+                              if(selectedScanner)
                               {
                                 if(skipStep)
                                 {
