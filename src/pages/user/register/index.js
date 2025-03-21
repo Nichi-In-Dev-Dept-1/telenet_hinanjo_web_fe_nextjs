@@ -1311,7 +1311,7 @@ const handleScan = async () => {
                           <i className="custom-target-icon-2 pi pi-info-circle"></i>
                         </div>
                       </div>
-                      { (window.location.pathname.startsWith('/user/register') &&(window.location.origin === "https://hitachi.nichi.in" || window.location.origin === "http://localhost:3000" )) && 
+                      { (window.location.pathname.startsWith('/user/register') &&(window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" )) && 
                           (
                       <div className="flex items-center">
                         <ButtonRounded
@@ -1325,7 +1325,6 @@ const handleScan = async () => {
                             icon: <img src={Card.url} width={30} height={30} />,
                             onClick: () => {
                               ivuResult();
-                             
                             },
                           }}
                           parentClass={
