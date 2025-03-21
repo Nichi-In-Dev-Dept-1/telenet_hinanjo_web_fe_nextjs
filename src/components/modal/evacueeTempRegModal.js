@@ -1090,7 +1090,7 @@ export default function EvacueeTempRegModal(props) {
                         </div>
                         
                         </div>
-                        { (window.location.pathname.startsWith('/user/register') &&(window.location.origin === "https://hitachi.nichi.in" || window.location.origin === "http://localhost:3000" )) && 
+                        { (window.location.pathname.startsWith('/user/register') &&(window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" )) && 
                           (
                         <div className="flex items-center">
                         <ButtonRounded
