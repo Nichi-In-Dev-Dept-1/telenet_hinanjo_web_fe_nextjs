@@ -41,6 +41,7 @@ import {
   QrScannerModal,
   BarcodeDialog,
   NormalLabel,
+  CommonDialog,
 } from "@/components";
 import { prefectures, prefectures_en } from "@/utils/constant";
 import {
@@ -104,6 +105,8 @@ export default function Admission() {
   const [activeEvacuationOptions, setActiveEvacutaionOptions] = useState([]);
   const [QrScanPopupModalOpen, setQrScanPopupModalOpen] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [modalMessageFlag, setModalMessageFlag] = useState(true);
 
 
 
@@ -133,6 +136,7 @@ export default function Admission() {
     getMasterQuestionnaireList,
     qrScanRegistration,
     ocrScanRegistration,
+    ivuToolRegistration,
     getActiveEvacuationPlaceList,
   } = TempRegisterServices;
 
@@ -368,6 +372,20 @@ const handleScan = async () => {
       }
     }
   }, [evacueeCount]);
+
+  useEffect(()=>{
+      setTimeout(()=>{
+      if(evacueeCount>0 && evacuee?.length >0 && (!modalCountFlag||evacueeCount==personCount) && modalMessageFlag)
+      {
+        if(regReducer.originalData?.length <= 0)
+        {
+        setShowAnimation(true);
+        }
+      }
+    else{
+      setShowAnimation(false);
+    }},1000);
+    },[evacueeCount,modalCountFlag])
 
   useEffect(() => {
     fetchMasterQuestion();
@@ -902,6 +920,54 @@ const handleScan = async () => {
     });
   };
 
+  const ivuResult = async () => {
+    setLoader(true);
+    let payload = {
+      client_url:"http://10.8.0.6:50080"
+    }
+    ivuToolRegistration(payload, async (res) => {
+      if (res) {
+        const evacueeArray = res.data.data;
+        let newEvacuee = createEvacuee(evacueeArray);
+        newEvacuee = {
+          ...newEvacuee,
+          isFromFormReader: true
+        };
+        if (!newEvacuee.postalCode || !evacueeArray.prefecture_id) {
+          const address = evacueeArray.fullAddress || evacueeArray.address;
+          try {
+            const { prefecture, postalCode, prefecture_id } = await geocodeAddressAndExtractData(address, localeJson, locale, setLoader);
+
+            // Update newEvacuee with geocoding data
+            newEvacuee = {
+              ...newEvacuee,
+              postalCode: postalCode,
+              prefecture_id: prefecture_id
+            };
+          } catch (error) {
+            console.error("Error fetching geolocation data:", error);
+          }
+        }
+        setEditObj(newEvacuee)
+        setRegisterModalAction("edit");
+        setSpecialCareEditOpen(true);
+        setEvacuee((prev) => {
+          return [
+            ...prev, // Use spread operator to include previous items in the array
+            newEvacuee, // Add the newEvacuee to the array
+          ];
+        });
+        formikRef.current.setFieldValue("evacuee", [
+          ...formikRef.current.values.evacuee,
+          newEvacuee,
+        ]);
+        setLoader(false);
+      } else {
+        setLoader(false);
+      }
+    });
+  };
+
   const handleRecordingStateChange = (isRecord) => {
     setMIsRecording(isRecord);
     setIsRecording(isRecord);
@@ -1103,6 +1169,24 @@ const handleScan = async () => {
 
   return (
     <>
+        <CommonDialog
+      open={showAnimation}
+      dialogBodyClassName="p-3 text-center"
+      header={translate(localeJson, 'guide')}
+      position="center"
+      footerParentClassName="text-center pt-5"
+      content={
+        <div className="text-left">
+          <p className="">{translate(localeJson, 'guide_message')}</p>
+          <p>{translate(localeJson, 'title')}</p>
+          <p>{translate(localeJson, 'title_policy')}</p>
+        </div>
+      }
+      footerButtonsArray={[]}
+      close={() =>{ setShowAnimation(false);
+        setModalMessageFlag(false);
+      }}
+    />
       <QrConfirmDialog
         visible={visible}
         setVisible={setVisible}
@@ -1289,6 +1373,37 @@ const handleScan = async () => {
                               <i className="custom-target-icon-2 pi pi-info-circle"></i>
                             </div>
                           </div>
+                          { ((window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" )) && 
+                          (
+                      <div className="flex items-center">
+                        <ButtonRounded
+                          buttonProps={{
+                            type: "button",
+                            rounded: "true",
+                            custom: "",
+                            buttonClass:
+                              "back-button h-4rem border-radius-5rem w-full custom-icon-button flex justify-content-center",
+                            text: translate(localeJson, "c_card_reg_ivu"),
+                            icon: <img src={Card.url} width={30} height={30} />,
+                            onClick: () => {
+                              ivuResult();
+                             
+                            },
+                          }}
+                          parentClass={
+                            " back-button  w-full flex justify-content-center p-2 pr-0 mb-2"
+                          }
+                        />
+                        <div>
+                          <Tooltip
+                            target=".custom-target-icon-3"
+                            position="bottom"
+                            content={translate(localeJson, "c_card_reg_ivu_msg")}
+                            className="shadow-none"
+                          />
+                          <i className="custom-target-icon-3 pi pi-info-circle"></i>
+                        </div>
+                      </div>)}
                         </div>
                         <div className="mt-3">
                           <div className="grid">
