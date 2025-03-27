@@ -144,6 +144,11 @@ const withAuth = (WrappedComponent) => {
                     router.push('/404');
                 } else if (isAuthenticated) {
                     if (path.startsWith('/admin')) {
+                        if(path.includes('/admin/stockpile') && !data?.stockpile_management_status){
+                            router.push({
+                                pathname: '/admin/dashboard',
+                            });
+                        }
                         if (adminPublicPaths.includes(path)) {
                             router.push({
                                 pathname: '/admin/dashboard',
@@ -155,6 +160,11 @@ const withAuth = (WrappedComponent) => {
                             });
                         }
                     } else if (path.startsWith('/staff')) {
+                        if(path.includes('/staff/stockpile') && !data?.stockpile_management_status){
+                            router.push({
+                                pathname: '/staff/dashboard',
+                            });
+                        }
                         if (staffPublicPathsWithLogin.includes(path)) {
                             router.push({
                                 pathname: '/user/list',
@@ -166,6 +176,11 @@ const withAuth = (WrappedComponent) => {
                             });
                         }
                     } else if (path.startsWith('/hq-staff')) {
+                        if(path.includes('/hq-staff/stockpile') && !data?.stockpile_management_status){
+                            router.push({
+                                pathname: '/hq-staff/dashboard',
+                            });
+                        }
                         if (hqStaffPublicPaths.includes(path)) {
                             router.push({
                                 pathname: '/hq-staff/dashboard',

@@ -44,7 +44,8 @@ export default function Setting() {
     default_shelf_life: "",
     scheduler_option: false,
     logo: "",
-    logo_name: ""
+    logo_name: "",
+    stockpile_management_status: false,
   }
   );
 
@@ -239,6 +240,8 @@ export default function Setting() {
       initialValuesPayload.longitude = data?.longitude || "";
       initialValuesPayload.initial_load_status =
         data?.initial_load_status == "1" ? true : false || "";
+      initialValuesPayload.stockpile_management_status = 
+      data?.stockpile_management_status == "1" ? true : false || "";
       (initialValuesPayload.default_shelf_life = data?.default_shelf_life || ""),
         (initialValuesPayload.scheduler_option =
           data?.scheduler_option == "1" ? true : false || "");
@@ -317,6 +320,10 @@ export default function Setting() {
             values.initial_load_status ? "1" : "0"
           );
           formData.append(
+            "stockpile_management_status",
+            values.stockpile_management_status ? "1" : "0"
+          );  
+          formData.append(
             "scheduler_option",
             values.scheduler_option ? "1" : "0"
           );
@@ -337,7 +344,8 @@ export default function Setting() {
               key !== "initial_load_status" &&
               key !== "scheduler_option" &&
               key !== "scheduler_option" &&
-              key !== "logo_name"
+              key !== "logo_name" &&
+              key !== "stockpile_management_status"
             ) {
               formData.append(key, values[key]);
             }
@@ -756,6 +764,24 @@ export default function Setting() {
                       />
                     </div>
                     <div className="w-8 modal-field-top-space modal-field-bottom-space pl-5">
+                    <div className="flex modal-field-bottom-space">
+                        <div className="pr-2">
+                          <NormalLabel
+                            text={translate(localeJson, "display_by_default")}
+                          />
+                        </div>
+                        <div className="mt-0">
+                          <InputSwitch
+                            inputSwitchProps={{
+                              name: "stockpile_management_status",
+                              checked: values.stockpile_management_status,
+                              onChange: handleChange,
+                              switchClass: "",
+                            }}
+                            parentClass={"custom-switch"}
+                          />
+                        </div>
+                      </div>
                       <div>
                         <div className="flex align-items-center">
                           <div style={{

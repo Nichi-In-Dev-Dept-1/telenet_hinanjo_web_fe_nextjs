@@ -93,7 +93,8 @@ const AppMenu = () => {
                     label: translate(localeJson, 'stockpile_summary'),
                     icon: <FaBoxes size={16} />,
                     to: '/admin/stockpile/summary',
-                    active: router.pathname.startsWith('/admin/stockpile/summary')
+                    active: router.pathname.startsWith('/admin/stockpile/summary'),
+                    visible: layoutReducer?.layout?.stockpile_management_status||false
                 },
                 {
                     label: translate(localeJson, 'statistics'),
@@ -166,7 +167,8 @@ const AppMenu = () => {
                     label: translate(localeJson, 'stockpile_master_management'),
                     icon: <FaBoxes size={16} />,
                     to: '/admin/stockpile/master',
-                    active: router.pathname.startsWith('/admin/stockpile/master')
+                    active: router.pathname.startsWith('/admin/stockpile/master'),
+                    visible: layoutReducer?.layout?.stockpile_management_status||false
                 }, {
                     label: translate(localeJson, 'special_care_list'),
                     icon: <PiHandTapFill size={16} />,
@@ -218,18 +220,21 @@ const AppMenu = () => {
         {
             label: translate(localeJson, 'staff_stockpile_management'),
             icon: <FaBoxes size={16} />,
+            visible: layoutReducer?.layout?.stockpile_management_status||false,
             items: [
                 {
                     label: translate(localeJson, 'stockpile_list'),
                     icon: <IoIosPaper size={16} />,
                     to: '/staff/stockpile/dashboard',
-                    active: router.pathname.startsWith('/staff/stockpile/dashboard')
+                    active: router.pathname.startsWith('/staff/stockpile/dashboard'),
+                    visible: layoutReducer?.layout?.stockpile_management_status||false
                 },
                 {
                     label: translate(localeJson, 'stockpile_history'),
                     icon: <RiFileHistoryFill size={16} />,
                     to: '/staff/stockpile/history',
-                    active: router.pathname.startsWith('/staff/stockpile/history')
+                    active: router.pathname.startsWith('/staff/stockpile/history'),
+                    visible: layoutReducer?.layout?.stockpile_management_status||false
                 }
             ]
         },
@@ -321,7 +326,8 @@ const AppMenu = () => {
                     label: translate(localeJson, 'stockpile_summary'),
                     icon: <FaBoxes size={16} />,
                     to: '/hq-staff/stockpile/summary',
-                    active: router.pathname.startsWith('/hq-staff/stockpile/summary')
+                    active: router.pathname.startsWith('/hq-staff/stockpile/summary'),
+                    visible: layoutReducer?.layout?.stockpile_management_status||false
                 },
                 {
                     label: translate(localeJson, 'statistics'),
