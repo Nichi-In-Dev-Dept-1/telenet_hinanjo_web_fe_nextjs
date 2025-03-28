@@ -63,6 +63,15 @@ export default function HQExternalEvacuationPage() {
         // { field: "place_detail", header: translate(localeJson, 'evacuation_site_type'), minWidth: "10rem", sortable: false },
         { field: "hinan_id", header: translate(localeJson, 'receiving_shelter'), minWidth: "10rem", sortable: false },
         { field: "food_required", header: translate(localeJson, 'need_food_support'), minWidth: "10rem", sortable: false },
+        {
+        field: 'person_refugee_name', header: translate(localeJson, 'representative'), sortable: false, alignHeader: "left",minWidth: "10rem", maxWidth: '10rem',
+            body: (rowData) => {
+                    return <div className="flex flex-column">
+                        <div className="custom-header">{rowData.person_name_kanji}</div>
+                        <div className="table-body-sub">{rowData.person_name_furigana}</div>
+                    </div>
+            },
+        },
         { field: "email", header: translate(localeJson, 'mail_address'), minWidth: "10rem", sortable: false },
         { field: "address", header: translate(localeJson, 'address'), minWidth: "10rem", sortable: false },
     ];

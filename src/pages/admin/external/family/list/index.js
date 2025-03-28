@@ -62,10 +62,19 @@ export default function ExternalEvacuationPage() {
     const externalEvacueesListColumns = [
         { field: "si_no", header: translate(localeJson, 'si_no'), className: "sno_class", textAlign: "center", sortable: false },
         { field: "place_category", header: translate(localeJson, 'shelter_site_type'), minWidth: "10rem", sortable: false },
-        { field: "place_detail", header: translate(localeJson, 'place_detail'), minWidth: "10rem", maxWidth: "15rem", sortable: false },
+        { field: "place_detail", header: translate(localeJson, 'place_detail'), minWidth: "10rem", maxWidth: "15rem", sortable: false }, 
         { field: "external_person_count", header: translate(localeJson, 'people_count'), minWidth: "10rem", sortable: false },
         { field: "hinan_id", header: translate(localeJson, 'receiving_shelter'), minWidth: "10rem", sortable: false },
         { field: "food_required", header: translate(localeJson, 'need_food_support'), minWidth: "10rem", sortable: false },
+        {
+            field: 'person_refugee_name', header: translate(localeJson, 'representative'), sortable: false, alignHeader: "left",minWidth: "10rem", maxWidth: '10rem',
+              body: (rowData) => {
+                         return <div className="flex flex-column">
+                             <div className="custom-header">{rowData.person_name_kanji}</div>
+                             <div className="table-body-sub">{rowData.person_name_furigana}</div>
+                         </div>
+                     },
+         },
         { field: "email", header: translate(localeJson, 'mail_address'), minWidth: "10rem", sortable: false },
         { field: "address", header: translate(localeJson, 'address'), minWidth: "10rem", sortable: false },
     ];
@@ -133,7 +142,9 @@ export default function ExternalEvacuationPage() {
                     ...item,
                     si_no: index + parseInt(getListPayload.filters.start) + 1,
                     address: translate(localeJson, 'post_letter') + (item.zipcode ? item.zipcode : "") + " " + (item.prefecture_name ? item.prefecture_name : "") + " " + (item.address ? item.address : "") + " " + (item.address_default ? item.address_default : ""),
-                    food_required: item.food_required ? item.food_required : translate(localeJson, 'no')
+                    food_required: item.food_required ? item.food_required : translate(localeJson, 'no'),
+                    // person_name_kanji:item.external_person_count ? item.external_person[0].name_kanji : "",
+                    // person_name_furigana:item.external_person_count ? item.external_person[0].name_furigana : ""
                 };
                 externalEvacueesList.push(evacuees);
             })

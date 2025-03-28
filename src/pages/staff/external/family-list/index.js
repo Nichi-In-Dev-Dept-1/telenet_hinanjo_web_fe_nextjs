@@ -35,6 +35,15 @@ function ExternalFamilyList() {
         { field: 'place_category', header: translate(localeJson, 'external_evecuee_list_table_place_category'), minWidth: "10rem", sortable: false, },
         { field: 'external_person_count', header: translate(localeJson, 'external_evecuee_list_table_person_count'), minWidth: "10rem", sortable: false },
         { field: 'hinan_id', header: translate(localeJson, 'external_evecuee_list_table_hinan_id'), minWidth: "10rem", maxWidth: "15rem", sortable: false, },
+        {
+          field: 'person_refugee_name', header: translate(localeJson, 'representative'), sortable: false, alignHeader: "left",minWidth: "10rem", maxWidth: '10rem',
+                  body: (rowData) => {
+                                 return <div className="flex flex-column">
+                                     <div className="custom-header">{rowData.person_name_kanji}</div>
+                                     <div className="table-body-sub">{rowData.person_name_furigana}</div>
+                                 </div>
+                             },
+        },
         { field: 'email', header: translate(localeJson, 'external_evecuee_list_table_email_address'), minWidth: "10rem", sortable: false, },
         { field: 'address', header: translate(localeJson, 'external_evecuee_list_table_address'), minWidth: "10rem", sortable: false, },
     ];
