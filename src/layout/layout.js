@@ -12,6 +12,7 @@ import { LayoutContext } from '@/layout/context/layoutcontext';
 import { zipDownloadWithURL, getValueByKeyRecursively as translate, } from '@/helper';
 import { QRCodeCreateServices } from '@/services';
 import toast from 'react-hot-toast';
+import Head from 'next/head'; // Import Head for SEO-friendly title updates
 
 const Layout = (props) => {
     const { layoutConfig, layoutState, setLayoutState, loader, localeJson, } = useContext(LayoutContext);
@@ -20,6 +21,68 @@ const Layout = (props) => {
     const router = useRouter();
     const windowURL = window.location.pathname;
     const path = router.asPath.split('?')[0];
+    const pageTitles = {  
+        // Admin URLs  
+        "/admin/login": "Telenet - Admin Login",
+        "/admin/dashboard": "Telenet - Dashboard",
+        "/admin/settings": "Telenet - Settings",
+        "/admin/event-status-list": "Telenet - Event-Status-List",
+        "/admin/event-attendees-list": "Telenet - Event-Attendees-List",
+        "/admin/history/place": "Telenet - History Place",
+        "/admin/evacuation": "Telenet - Evacuation",
+        "/admin/temp-registration": "Telenet - Temp Registration",
+        "/admin/external/family/list": "Telenet - External Family List",
+        "/admin/shortage-supplies": "Telenet - Shortage Supplies",
+        "/admin/stockpile/summary": "Telenet - Stockpile Summary",
+        "/admin/statistics": "Telenet - Statistics",
+        "/admin/qrcode/csv/import": "Telenet - QR Code CSV Import",
+        "/admin/staff-management": "Telenet - Staff Management",
+        "/admin/hq-staff-management": "Telenet - HQ Staff Management",
+        "/admin/admin-management": "Telenet - Admin Management",
+        "/admin/event": "Telenet - Event",
+        "/admin/questionnaire": "Telenet - Questionnaire",
+        "/admin/place": "Telenet - Place",
+        "/admin/material": "Telenet - Material",
+        "/admin/stockpile/master": "Telenet - Stockpile Master",
+        "/admin/special/care": "Telenet - Special Care",
+        "/admin/setting": "Telenet - Setting",
+     
+        // User URLs  
+        "/user/list": "Telenet - User List",
+        "/user/dashboard": "Telenet - User Dashboard",
+        "/user/register/member": "Telenet - Register Member",
+        "/user/register/member/details": "Telenet - Register Member Details",
+        "/user/checkout": "Telenet - Checkout",
+        "/user/checkout/details": "Telenet - Checkout Details",
+        "/user/external": "Telenet - External",
+        "/user/public-evacuees/": "Telenet - Public Evacuees",
+     
+        // Staff URLs  
+        "/staff/login": "Telenet - Staff Login",
+        "/staff/dashboard": "Telenet - Staff Dashboard",
+        "/staff/family": "Telenet - Staff Family",
+        "/staff/family/family-detail": "Telenet - Staff Family Detail",
+        "/staff/temporary/family": "Telenet - Temporary Family",
+        "/staff/external/family-list": "Telenet - External Family List",
+        "/staff/stockpile/dashboard": "Telenet - Stockpile Dashboard",
+        "/staff/stockpile/history": "Telenet - Stockpile History",
+        "/staff/supplies": "Telenet - Supplies",
+        "/staff/register/check-in": "Telenet - Register Check-in",
+     
+        // HQ Staff URLs  
+        "/hq-staff/login": "Telenet - HQ Staff Login",
+        "/hq-staff/dashboard": "Telenet - HQ Staff Dashboard",
+        "/hq-staff/history/place": "Telenet - HQ History Place",
+        "/hq-staff/evacuation": "Telenet - HQ Evacuation",
+        "/hq-staff/temp-registration": "Telenet - HQ Temp Registration",
+        "/hq-staff/external/family/list": "Telenet - HQ External Family List",
+        "/hq-staff/shortage-supplies": "Telenet - HQ Shortage Supplies",
+        "/hq-staff/stockpile/summary": "Telenet - HQ Stockpile Summary",
+        "/hq-staff/statistics": "Telenet - HQ Statistics",
+        "/hq-staff/place": "Telenet - HQ Place",
+        "/hq-staff/material": "Telenet - HQ Material"
+    };
+    
 
     const [bindMenuOutsideClickListener, unbindMenuOutsideClickListener] = useEventListener({
         type: 'click',
@@ -158,6 +221,12 @@ const Layout = (props) => {
 
     return (
         <React.Fragment>
+             {((window.location.origin === "https://rakuraku.nichi.in" || window.location.origin === "http://localhost:3000" )) && (
+             <Head>
+                <title>{pageTitles[path.replace(/\/$/, '')] || 'Telenet'}</title>
+            </Head>
+            )}
+
             <div className={containerClass}>
                 <AppTopbar ref={topbarRef} />
                 {!URLS.includes(path) && (
