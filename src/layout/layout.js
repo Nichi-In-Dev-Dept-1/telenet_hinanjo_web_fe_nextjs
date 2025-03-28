@@ -15,13 +15,13 @@ import toast from 'react-hot-toast';
 import Head from 'next/head'; // Import Head for SEO-friendly title updates
 
 const Layout = (props) => {
-    const { layoutConfig, layoutState, setLayoutState, loader, localeJson,locale } = useContext(LayoutContext);
+    const { layoutConfig, layoutState, setLayoutState, loader, localeJson, locale } = useContext(LayoutContext);
     const topbarRef = useRef(null);
     const sidebarRef = useRef(null);
     const router = useRouter();
     const windowURL = window.location.pathname;
     const path = router.asPath.split('?')[0];
-    const pageTitles_en = {  
+    const pageTitles_en = {
         // Admin URLs  
         "/admin/login": "Telenet - Admin Login",
         "/admin/dashboard": "Telenet - Dashboard",
@@ -52,7 +52,8 @@ const Layout = (props) => {
         "/admin/external/family/list/family-detail": "Telenet - External Family List Detail",
         "/admin/place/create": "Telenet - Create Place",
         "/admin/place/detail": "Telenet - Place Detail",
-     
+        "/admin/place/edit": "Telenet - Place Edit",
+
         // User URLs  
         "/user/list": "Telenet - User List",
         "/user/dashboard": "Telenet - User Dashboard",
@@ -76,8 +77,8 @@ const Layout = (props) => {
         "/user/event/checkout": "Telenet - Event Checkout",
         "/user/event-checkout/details": "Telenet - Event Checkout Details",
         "/user/qr/app": "Telenet - QR App",
-        
-     
+
+
         // Staff URLs  
         "/staff/login": "Telenet - Staff Login",
         "/staff/dashboard": "Telenet - Staff Dashboard",
@@ -91,7 +92,10 @@ const Layout = (props) => {
         "/staff/stockpile/history": "Telenet - Stockpile History",
         "/staff/supplies": "Telenet - Supplies",
         "/staff/register/check-in": "Telenet - Register Check-in",
-     
+        "/staff/event-staff/dashboard": "Telenet - Event Staff Dashboard",
+        "/staff/event-staff/family": "Telenet - Event Staff Family",
+        "/staff/event-staff/family/family-detail": "Telenet - Event Staff Family Detail",
+
         // HQ Staff URLs  
         "/hq-staff/login": "Telenet - HQ Staff Login",
         "/hq-staff/dashboard": "Telenet - HQ Staff Dashboard",
@@ -109,9 +113,9 @@ const Layout = (props) => {
         "/hq-staff/external/family/list/family-detail": "Telenet - External Family List Detail",
     };
 
-    const pageTitles_ja = {  
+    const pageTitles_ja = {
         // Admin URLs 
-        "/admin/login": "管理システム - ログイン", 
+        "/admin/login": "管理システム - ログイン",
         "/admin/dashboard": "管理システム - 避難所状況一覧",
         "/admin/settings": "管理システム - 環境設定",
         "/admin/event-status-list": "管理システム -イベント状況一覧",
@@ -140,6 +144,7 @@ const Layout = (props) => {
         "/admin/external/family/list/family-detail": "管理システム - 外部避難者詳細",
         "/admin/place/create": "管理システム - 避難所新規",
         "/admin/place/detail": "管理システム - 避難所詳細",
+        "/admin/place/edit": "管理システム - 避難所編集",
         // User URLs  
         "/user/list": "ユーザー管理 -避難所管理システム一覧",
         "/user/dashboard": "ユーザー管理 - ダッシュボード",
@@ -162,8 +167,8 @@ const Layout = (props) => {
         "/user/event-list/": "ユーザー管理 - イベント一覧",
         "/user/event/dashboard": "ユーザー管理 - イベントダッシュボード",
         "/user/event/register": "ユーザー管理 - イベント登録",
-        "/user/event/register/member": "ユーザー管理 - イベント登録手続き",
-        "/user/event/checkout": "ユーザー管理 - イベント退所手続き",
+        "/user/event/register/member": "ユーザー管理 - 入場手続き",
+        "/user/event/checkout": "ユーザー管理 - 退場手続き",
         "user/qr/app": "ユーザー管理 - QRコード登録",
         // Staff URLs  
         "/staff/login": "スタッフ管理 - ログイン",
@@ -176,8 +181,11 @@ const Layout = (props) => {
         "/staff/stockpile/history": "スタッフ管理 - 備蓄品履歴",
         "/staff/supplies": "スタッフ管理 - 必要物資登録",
         "/staff/register/check-in": "スタッフ管理 - 入所者数登録",
-        "/staff/temporary/family-detail": "スタッフ管理 -避難前登録者詳細",
+        "/staff/temporary/family-detail": "スタッフ管理 - 避難前登録者詳細",
         "/staff/external/family-list/family-detail": "スタッフ管理 - 外部避難者詳細",
+        "/staff/event-staff/dashboard": "スタッフ管理 - イベントの状況",
+        "/staff/event-staff/family": "スタッフ管理 - 出席者一覧",
+        "/staff/event-staff/family/family-detail": "スタッフ管理 - 出席者詳細",
         // HQ Staff URLs  
         "/hq-staff/login": "本部スタッフ - ログイン",
         "/hq-staff/dashboard": "本部スタッフ -避難所の状況",
@@ -194,7 +202,7 @@ const Layout = (props) => {
         "/hq-staff/temp-registration/family-detail": "本部スタッフ - 避難前登録者詳細",
         "/hq-staff/external/family/list/family-detail": "本部スタッフ - 外部避難者詳細",
     };
-    
+
 
     const [bindMenuOutsideClickListener, unbindMenuOutsideClickListener] = useEventListener({
         type: 'click',
@@ -266,22 +274,22 @@ const Layout = (props) => {
         });
     }, []);
     useEffect(() => {
-       
+
         const interval = setInterval(() => {
-          const currentValue = localStorage.getItem("batch_id") || "";
-          
-          if (currentValue) {
-            const payload = { batch_id: currentValue };
-    
-            // Call the service to download the zip file
-            QRCodeCreateServices.callBatchDownload(payload, onZipDownloadSuccess);
-          }
+            const currentValue = localStorage.getItem("batch_id") || "";
+
+            if (currentValue) {
+                const payload = { batch_id: currentValue };
+
+                // Call the service to download the zip file
+                QRCodeCreateServices.callBatchDownload(payload, onZipDownloadSuccess);
+            }
         }, 15000); // 15000 ms = 15 seconds
-    
+
         // Cleanup interval on component unmount
         return () => clearInterval(interval);
 
-      }, [localStorage.getItem("batch_id")]);
+    }, [localStorage.getItem("batch_id")]);
 
 
 
@@ -292,11 +300,11 @@ const Layout = (props) => {
 
     const onZipDownloadSuccess = async (response) => {
         if (response && response.data.data.download_link) {
-            toast.success(translate(localeJson,'qr_success'), {
+            toast.success(translate(localeJson, 'qr_success'), {
                 position: "top-right",
             });
             await zipDownloadWithURL(response.data.data.download_link);
-            localStorage.setItem('batch_id','');
+            localStorage.setItem('batch_id', '');
         }
     };
 
@@ -333,10 +341,10 @@ const Layout = (props) => {
 
     return (
         <React.Fragment>
-             {((window.location.origin === "https://rakuraku.nichi.in" || window.location.origin === "http://localhost:3000" )) && (
-             <Head>
-                <title>{locale=="ja"?(pageTitles_ja[path.replace(/\/$/, '')]||'テレネット'):pageTitles_en[path.replace(/\/$/, '')] || 'Telenet'}</title>
-            </Head>
+            {((window.location.origin === "https://rakuraku.nichi.in" || window.location.origin === "http://localhost:3000")) && (
+                <Head>
+                    <title>{locale == "ja" ? (pageTitles_ja[path.replace(/\/$/, '')] || 'テレネット') : pageTitles_en[path.replace(/\/$/, '')] || 'Telenet'}</title>
+                </Head>
             )}
 
             <div className={containerClass}>
