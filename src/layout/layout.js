@@ -15,13 +15,13 @@ import toast from 'react-hot-toast';
 import Head from 'next/head'; // Import Head for SEO-friendly title updates
 
 const Layout = (props) => {
-    const { layoutConfig, layoutState, setLayoutState, loader, localeJson, } = useContext(LayoutContext);
+    const { layoutConfig, layoutState, setLayoutState, loader, localeJson,locale } = useContext(LayoutContext);
     const topbarRef = useRef(null);
     const sidebarRef = useRef(null);
     const router = useRouter();
     const windowURL = window.location.pathname;
     const path = router.asPath.split('?')[0];
-    const pageTitles = {  
+    const pageTitles_en = {  
         // Admin URLs  
         "/admin/login": "Telenet - Admin Login",
         "/admin/dashboard": "Telenet - Dashboard",
@@ -46,6 +46,12 @@ const Layout = (props) => {
         "/admin/stockpile/master": "Telenet - Stockpile Master",
         "/admin/special/care": "Telenet - Special Care",
         "/admin/setting": "Telenet - Setting",
+        "/admin/event-attendees-list/family-detail": "Telenet - Event Attendees Family Detail",
+        "/admin/evacuation/family-detail": "Telenet - Evacuation Family Detail",
+        "/admin/temp-registration/family-detail": "Telenet - Temporary Registration Family Detail",
+        "/admin/external/family/list/family-detail": "Telenet - External Family List Detail",
+        "/admin/place/create": "Telenet - Create Place",
+        "/admin/place/detail": "Telenet - Place Detail",
      
         // User URLs  
         "/user/list": "Telenet - User List",
@@ -56,12 +62,29 @@ const Layout = (props) => {
         "/user/checkout/details": "Telenet - Checkout Details",
         "/user/external": "Telenet - External",
         "/user/public-evacuees/": "Telenet - Public Evacuees",
+        "/user/temp-register": "Telenet - Temporary Registration",
+        "//user/temp-edit/confirm": "Telenet - Temporary Details Confirmation",
+        "/user/temp-register/success": "Telenet - Temporary Registration Success",
+        "/user/temp-edit": "Telenet - Temporary Edit",
+        "/user/person-count": "Telenet - Person Count",
+        "/user/event-list": "Telenet - Event List",
+        "/user/event-list/": "Telenet - Event List",
+        "/user/event/dashboard": "Telenet - Event Dashboard",
+        "/user/event/register": "Telenet - Event Register",
+        "/user/event/register/member": "Telenet - Event Register Member",
+        "/user/event/register/member/details": "Telenet - Event Register Member Details",
+        "/user/event/checkout": "Telenet - Event Checkout",
+        "/user/event-checkout/details": "Telenet - Event Checkout Details",
+        "/user/qr/app": "Telenet - QR App",
+        
      
         // Staff URLs  
         "/staff/login": "Telenet - Staff Login",
         "/staff/dashboard": "Telenet - Staff Dashboard",
         "/staff/family": "Telenet - Staff Family",
-        "/staff/family/family-detail": "Telenet - Staff Family Detail",
+        "/staff/family/family-detail": "Telenet - Family Detail",
+        "/staff/temporary/family-detail": "Telenet - Temporary Family Detail",
+        "/staff/external/family-list/family-detail": "Telenet - External Family List Detail",
         "/staff/temporary/family": "Telenet - Temporary Family",
         "/staff/external/family-list": "Telenet - External Family List",
         "/staff/stockpile/dashboard": "Telenet - Stockpile Dashboard",
@@ -80,7 +103,96 @@ const Layout = (props) => {
         "/hq-staff/stockpile/summary": "Telenet - HQ Stockpile Summary",
         "/hq-staff/statistics": "Telenet - HQ Statistics",
         "/hq-staff/place": "Telenet - HQ Place",
-        "/hq-staff/material": "Telenet - HQ Material"
+        "/hq-staff/material": "Telenet - HQ Material",
+        "/hq-staff/evacuation/family-detail": "Telenet - Evacuation Family Detail",
+        "/hq-staff/temp-registration/family-detail": "Telenet - Temporary Registration Family Detail",
+        "/hq-staff/external/family/list/family-detail": "Telenet - External Family List Detail",
+    };
+
+    const pageTitles_ja = {  
+        // Admin URLs 
+        "/admin/login": "管理システム - ログイン", 
+        "/admin/dashboard": "管理システム - 避難所状況一覧",
+        "/admin/settings": "管理システム - 環境設定",
+        "/admin/event-status-list": "管理システム -イベント状況一覧",
+        "/admin/event-attendees-list": "管理システム- 出席者一覧",
+        "/admin/history/place": "管理システム - 避難所状況履歴",
+        "/admin/evacuation": "管理システム - 避難者一覧",
+        "/admin/temp-registration": "管理システム - 避難前登録者一覧",
+        "/admin/external/family/list": "管理システム - 外部避難者一覧",
+        "/admin/shortage-supplies": "管理システム - 不足物資一覧",
+        "/admin/stockpile/summary": "管理システム - 備蓄品集計",
+        "/admin/statistics": "管理システム - 統計",
+        "/admin/qrcode/csv/import": "管理システム -QRコード作成",
+        "/admin/staff-management": "管理システム- スタッフ管理",
+        "/admin/hq-staff-management": "管理システム - 本部スタッフ管理",
+        "/admin/admin-management": "管理システム - 管理者管理",
+        "/admin/event": "管理システム -イベントマスタ管理",
+        "/admin/questionnaire": "管理システム - 問診マスタ管理",
+        "/admin/place": "管理システム - 避難所マスタ管理",
+        "/admin/material": "管理システム - 物資マスタ管理",
+        "/admin/stockpile/master": "管理システム - 備蓄品マスタ管理",
+        "/admin/special/care": "管理システム - 要配慮者事項",
+        "/admin/setting": "管理システム - 環境設定",
+        "/admin/event-attendees-list/family-detail": " 管理システム- 出席者詳細",
+        "/admin/evacuation/family-detail": "管理システム - 避難者詳細",
+        "/admin/temp-registration/family-detail": "管理システム - 避難前登録者詳細",
+        "/admin/external/family/list/family-detail": "管理システム - 外部避難者詳細",
+        "/admin/place/create": "管理システム - 避難所新規",
+        "/admin/place/detail": "管理システム - 避難所詳細",
+        // User URLs  
+        "/user/list": "ユーザー管理 -避難所管理システム一覧",
+        "/user/dashboard": "ユーザー管理 - ダッシュボード",
+        "/user/register/member": "ユーザー管理 - 入所手続き",
+        "/user/register/member/details": "ユーザー管理 - 入所世帯情報",
+        "/user/register": "ユーザー管理 - 入所手続き",
+        "/user/register/confirm": "ユーザー管理 - 入所手続き確認",
+        "/user/register/success": "ユーザー管理 - 入所手続き成功",
+        "/user/checkout": "ユーザー管理 - 退所手続き",
+        "/user/checkout/details": "ユーザー管理 - 退所世帯情報",
+        "/user/external": "ユーザー管理 - 外部避難者登録",
+        "/user/public-evacuees/": "ユーザー管理 - 公共避難者登録",
+        "/user/person-count": "ユーザー管理 - 家族(数)",
+        "/user/temp-register": "ユーザー管理 - 避難前登録",
+        "/user/temp-register/confirm": "ユーザー管理 - 避難前登録確認",
+        "/user/temp-person-count": "ユーザー管理 - 家族(数)",
+        "/user/temp-register/success": "ユーザー管理 - 避難前登録手続き",
+        "/user/temp-edit": "ユーザー管理 - 避難前登録編集",
+        "/user/event-list": "ユーザー管理 - イベント一覧",
+        "/user/event-list/": "ユーザー管理 - イベント一覧",
+        "/user/event/dashboard": "ユーザー管理 - イベントダッシュボード",
+        "/user/event/register": "ユーザー管理 - イベント登録",
+        "/user/event/register/member": "ユーザー管理 - イベント登録手続き",
+        "/user/event/checkout": "ユーザー管理 - イベント退所手続き",
+        "user/qr/app": "ユーザー管理 - QRコード登録",
+        // Staff URLs  
+        "/staff/login": "スタッフ管理 - ログイン",
+        "/staff/dashboard": "スタッフ管理 - 避難所の状況",
+        "/staff/family": "スタッフ管理 - 避難者一覧",
+        "/staff/family/family-detail": "スタッフ管理 - 避難者詳細",
+        "/staff/temporary/family": "スタッフ管理 -避難前登録者一覧",
+        "/staff/external/family-list": "スタッフ管理 -  外部避難者一覧",
+        "/staff/stockpile/dashboard": "スタッフ管理 - 備蓄品一覧",
+        "/staff/stockpile/history": "スタッフ管理 - 備蓄品履歴",
+        "/staff/supplies": "スタッフ管理 - 必要物資登録",
+        "/staff/register/check-in": "スタッフ管理 - 入所者数登録",
+        "/staff/temporary/family-detail": "スタッフ管理 -避難前登録者詳細",
+        "/staff/external/family-list/family-detail": "スタッフ管理 - 外部避難者詳細",
+        // HQ Staff URLs  
+        "/hq-staff/login": "本部スタッフ - ログイン",
+        "/hq-staff/dashboard": "本部スタッフ -避難所の状況",
+        "/hq-staff/history/place": "本部スタッフ -避難所状況履歴",
+        "/hq-staff/evacuation": "本部スタッフ -避難者一覧",
+        "/hq-staff/temp-registration": "本部スタッフ - 避難前登録者一覧",
+        "/hq-staff/external/family/list": "本部スタッフ - 外部避難者一覧",
+        "/hq-staff/shortage-supplies": "本部スタッフ- 必要物資登録",
+        "/hq-staff/stockpile/summary": "本部スタッフ - 備蓄品集計",
+        "/hq-staff/statistics": "本部スタッフ - 統計",
+        "/hq-staff/place": "本部スタッフ -避難所マスタ管理",
+        "/hq-staff/material": "本部スタッフ - 物資マスタ管理",
+        "/hq-staff/evacuation/family-detail": "本部スタッフ - 避難者詳細",
+        "/hq-staff/temp-registration/family-detail": "本部スタッフ - 避難前登録者詳細",
+        "/hq-staff/external/family/list/family-detail": "本部スタッフ - 外部避難者詳細",
     };
     
 
@@ -223,7 +335,7 @@ const Layout = (props) => {
         <React.Fragment>
              {((window.location.origin === "https://rakuraku.nichi.in" || window.location.origin === "http://localhost:3000" )) && (
              <Head>
-                <title>{pageTitles[path.replace(/\/$/, '')] || 'Telenet'}</title>
+                <title>{locale=="ja"?(pageTitles_ja[path.replace(/\/$/, '')]||'テレネット'):pageTitles_en[path.replace(/\/$/, '')] || 'Telenet'}</title>
             </Head>
             )}
 
