@@ -80,6 +80,7 @@ const Layout = (props) => {
         "/user/event/checkout": "Telenet - Event Checkout",
         "/user/event-checkout/details": "Telenet - Event Checkout Details",
         "/user/qr/app": "Telenet - QR App",
+        "/event/register/member/success": "Telenet - Event Register Member Success",
 
 
         // Staff URLs  
@@ -151,7 +152,7 @@ const Layout = (props) => {
         "/admin/place/edit": "管理システム - 避難所編集",
         "/admin/external/family": "管理システム-外部避難者集計",
         "/admin/questionnaire/master": "管理システム-全体の個別項目",
-        "/admin/questionnaire/individual": "管理システム-個人ごとの個別項目"
+        "/admin/questionnaire/individual": "管理システム-個人ごとの個別項目",
         // User URLs  
         "/user/list": "ユーザー管理 -避難所管理システム一覧",
         "/user/dashboard": "ユーザー管理 - ダッシュボード",
@@ -177,6 +178,7 @@ const Layout = (props) => {
         "/user/event/register/member": "ユーザー管理 - 入場手続き",
         "/user/event/checkout": "ユーザー管理 - 退場手続き",
         "user/qr/app": "ユーザー管理 - QRコード登録",
+        "/event/register/member/success": "ユーザー管理-登録完了。",
         // Staff URLs  
         "/staff/login": "スタッフ管理 - ログイン",
         "/staff/dashboard": "スタッフ管理 - 避難所の状況",
