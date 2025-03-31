@@ -53,6 +53,9 @@ const Layout = (props) => {
         "/admin/place/create": "Telenet - Create Place",
         "/admin/place/detail": "Telenet - Place Detail",
         "/admin/place/edit": "Telenet - Place Edit",
+        "/admin/external/family": "Telenet-External Evacuee Summary",
+        "/admin/questionnaire/master": "Telenet-Master Questionnaires",
+        "/admin/questionnaire/individual": "Telenet-Individual Questionnaires",
 
         // User URLs  
         "/user/list": "Telenet - User List",
@@ -111,6 +114,7 @@ const Layout = (props) => {
         "/hq-staff/evacuation/family-detail": "Telenet - Evacuation Family Detail",
         "/hq-staff/temp-registration/family-detail": "Telenet - Temporary Registration Family Detail",
         "/hq-staff/external/family/list/family-detail": "Telenet - External Family List Detail",
+        "/hq-staff/place/detail": "Telenet - Place Detail",
     };
 
     const pageTitles_ja = {
@@ -145,6 +149,9 @@ const Layout = (props) => {
         "/admin/place/create": "管理システム - 避難所新規",
         "/admin/place/detail": "管理システム - 避難所詳細",
         "/admin/place/edit": "管理システム - 避難所編集",
+        "/admin/external/family": "管理システム-外部避難者集計",
+        "/admin/questionnaire/master": "管理システム-全体の個別項目",
+        "/admin/questionnaire/individual": "管理システム-個人ごとの個別項目"
         // User URLs  
         "/user/list": "ユーザー管理 -避難所管理システム一覧",
         "/user/dashboard": "ユーザー管理 - ダッシュボード",
@@ -201,6 +208,8 @@ const Layout = (props) => {
         "/hq-staff/evacuation/family-detail": "本部スタッフ - 避難者詳細",
         "/hq-staff/temp-registration/family-detail": "本部スタッフ - 避難前登録者詳細",
         "/hq-staff/external/family/list/family-detail": "本部スタッフ - 外部避難者詳細",
+        "/hq-staff/place/detail": "本部スタッフ-避難所詳細"
+        
     };
 
 
