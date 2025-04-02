@@ -1174,7 +1174,7 @@ async function fetchIvuData() {
                                                   icon: <img src={Card.url} width={30} height={30} />,
                                                   onClick: () => {
                                                     isIvuDeviceConnected?ivuResult():
-                              toast.error(locale=="en"?'Try again after by making sure your device is connected.':' デバイスが接続されていることを確認して、もう一度お試しく', {
+                              toast.error(locale=="en"?'Please check if the identity verification device is connected.':' 本人確認装置が接続されているかご確認ください。', {
                                 position: "top-right",
                               });
                                                    
