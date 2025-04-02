@@ -1104,6 +1104,27 @@ const handleScan = async () => {
 
   },[visible])
 
+  useEffect(()=>{
+    fetchIvuData();
+},[])
+
+async function fetchIvuData() {
+  try {
+      let res = await fetch("http://127.0.0.1:50080/ivuapi/INITIALIZE_STATUS", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({}) // Include any necessary payload
+      });
+
+      let data = await res.json(); // Assuming the response is in JSON format
+      console.log(data); // Log the response data
+  } catch (error) {
+      console.error("Error fetching data:", error);
+  }
+}
+
 
 
   return (
