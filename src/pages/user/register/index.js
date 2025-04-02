@@ -101,6 +101,7 @@ export default function Admission() {
   const [modalMessageFlag, setModalMessageFlag] = useState(true);
   const [confirm, setConfirm] = useState(false);
   const [skipStep,setSkipStep] = useState(false);
+  const [isIvuDeviceConnected,setIsIvuDeviceConnected] = useState(false);
 
   const toggleExpansion = (personId) => {
     setExpandedFamilies((prevExpanded) =>
@@ -1119,8 +1120,12 @@ async function fetchIvuData() {
       });
 
       let data = await res.json(); // Assuming the response is in JSON format
-      console.log(data); // Log the response data
+      if(data.result=="OK")
+      {
+        setIsIvuDeviceConnected(true)
+      }
   } catch (error) {
+      setIsIvuDeviceConnected(false)
       console.error("Error fetching data:", error);
   }
 }
@@ -1402,7 +1407,10 @@ async function fetchIvuData() {
                             text: translate(localeJson, "c_card_reg_ivu"),
                             icon: <img src={Card.url} width={30} height={30} />,
                             onClick: () => {
-                              ivuResult();
+                              isIvuDeviceConnected?ivuResult():
+                              toast.error(locale=="en"?'Try again after by making sure your device is connected.':' デバイスが接続されていることを確認して、もう一度お試しく', {
+                                position: "top-right",
+                              });
                              
                             },
                           }}
