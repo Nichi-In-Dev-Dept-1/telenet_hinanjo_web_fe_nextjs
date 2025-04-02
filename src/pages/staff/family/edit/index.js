@@ -83,6 +83,7 @@ export default function Admission() {
   const [perspectiveImageCroppingVisible, setPerspectiveImageCroppingVisible] = useState(false);
   const [QrScanPopupModalOpen, setQrScanPopupModalOpen] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [isIvuDeviceConnected,setIsIvuDeviceConnected] = useState(false);
   const formikRef = useRef();
 
   const toggleExpansion = (personId) => {
@@ -986,6 +987,31 @@ const handleScan = async () => {
 
   },[visible])
 
+  useEffect(()=>{
+    fetchIvuData();
+},[])
+
+async function fetchIvuData() {
+  try {
+      let res = await fetch("http://127.0.0.1:50080/ivuapi/INITIALIZE_STATUS", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({}) // Include any necessary payload
+      });
+
+      let data = await res.json(); // Assuming the response is in JSON format
+      if(data.result=="OK")
+      {
+        setIsIvuDeviceConnected(true)
+      }
+  } catch (error) {
+      setIsIvuDeviceConnected(false)
+      console.error("Error fetching data:", error);
+  }
+}
+
   return (
     <>
       <QrConfirmDialog
@@ -1170,7 +1196,10 @@ const handleScan = async () => {
                             text: translate(localeJson, "c_card_reg_ivu"),
                             icon: <img src={Card.url} width={30} height={30} />,
                             onClick: () => {
-                              ivuResult();
+                              isIvuDeviceConnected?ivuResult():
+                              toast.error(locale=="en"?'Try again after by making sure your device is connected.':' デバイスが接続されていることを確認して、もう一度お試しく', {
+                                position: "top-right",
+                              });
                              
                             },
                           }}
