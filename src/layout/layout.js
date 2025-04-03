@@ -354,13 +354,10 @@ const Layout = (props) => {
 
     return (
         <React.Fragment>
-            {((window.location.origin === "https://rakuraku.nichi.in" || window.location.origin === "http://localhost:3000")) && (
                 <Head>
                     <title>{locale == "ja" ? (pageTitles_ja[path.replace(/\/$/, '')] || 'テレネット') : pageTitles_en[path.replace(/\/$/, '')] || 'Telenet'}</title>
                      <link rel="icon" href={`/layout/images/favicon.ico`} type="image/x-icon"></link>
                 </Head>
-            )}
-
             <div className={containerClass}>
                 <AppTopbar ref={topbarRef} />
                 {!URLS.includes(path) && (
