@@ -1324,13 +1324,14 @@ function calculateDOBAge(birthdate) {
    * @param {string} text - The string to be converted.
    * @returns {string} The converted string in Katakana without any spaces.
    */
-  function convertNameToKatakana(text) {
-    CommonServices.convertToKatakana(text, (res) => {
-        if (res) {
-           return res.converted.replace(/ /g, "");
-        }
-        else {
-            return "";
-        }
-      });
-  }
+  async function convertNameToKatakana(text) {
+    return new Promise((resolve) => {
+        CommonServices.convertToKatakana(text, (res) => {
+            if (res) {
+                resolve(res.converted);
+            } else {
+                resolve("");
+            }
+        });
+    });
+}
