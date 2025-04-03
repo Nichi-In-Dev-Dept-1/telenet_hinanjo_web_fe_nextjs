@@ -1027,9 +1027,9 @@ function calculateDOBAge(birthdate) {
         const response = await ivuApi(request);
         if(response)
         {
+            console.log("Final extracted data:", response);
             return response;
         }
-        console.log("Final extracted data:", response);
     } catch (error) {
         console.error("Error occurred:", error.message);
     }
@@ -1183,7 +1183,7 @@ function calculateDOBAge(birthdate) {
         console.info(`${command} response:`, data);
   
         if (command === "GET_RECORD") {
-            return extractDataFromRecordResponse(data);
+            return await extractDataFromRecordResponse(data);
         }
   
         return {};
@@ -1241,7 +1241,7 @@ function calculateDOBAge(birthdate) {
    * @property {string} gender The gender of the person.
    * @property {string} TuikiIC The TuikiIC of the person.
    */
-  function extractDataFromRecordResponse(response) {
+  async function extractDataFromRecordResponse(response) {
     const holderInfo = response?.output?.IDCARD_OUTPUT?.HolderInfo || {};
     return {
         fullAddress: holderInfo.Address || null,
@@ -1250,7 +1250,7 @@ function calculateDOBAge(birthdate) {
         dob: holderInfo.DayOfBirth || null,
         Gaiji: holderInfo.Gaiji || null,
         name: holderInfo.Name1 ? holderInfo.Name1 : null,
-        refugeeName: holderInfo.Name1 ? convertNameToKatakana(holderInfo.Name1) : null,
+        refugeeName: holderInfo.Name1 ? await convertNameToKatakana(holderInfo.Name1) : null,
         gender: holderInfo.Sexuality || null,
         TuikiIC: holderInfo.TuikiIC || null,
     };
