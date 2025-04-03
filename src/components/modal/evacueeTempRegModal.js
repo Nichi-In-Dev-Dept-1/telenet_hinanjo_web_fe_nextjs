@@ -489,11 +489,11 @@ async function fetchIvuData() {
     });
   };
 
-  const ivuResult = () => {
+  const ivuResult = async() => {
     if(window.location.origin === "https://rakuraku.nichi.in"){
       try{
         console.log("win")
-      const evacueeArray = fetchIvuResponse();
+      const evacueeArray = await fetchIvuResponse();
       formikRef.current.resetForm();
       createEvacuee(evacueeArray, formikRef.current.setFieldValue);
       setLoader(false);
