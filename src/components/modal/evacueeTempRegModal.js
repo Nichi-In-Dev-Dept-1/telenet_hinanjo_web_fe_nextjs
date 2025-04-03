@@ -12,6 +12,7 @@ import {
   compareAddresses,
   geocodeAddressAndExtractData,
   extractAddress,
+  fetchIvuResponse,
   // transformData,
 } from "@/helper";
 import {
@@ -489,6 +490,20 @@ async function fetchIvuData() {
   };
 
   const ivuResult = () => {
+    if(window.location.origin === "https://rakuraku.nichi.in"){
+      try{
+        console.log("win")
+      const evacueeArray = fetchIvuResponse();
+      formikRef.current.resetForm();
+      createEvacuee(evacueeArray, formikRef.current.setFieldValue);
+      setLoader(false);
+      return
+      }
+      catch(err) {
+        console.log(err)
+
+      }
+    }
     setLoader(true);
     let payload = {
       client_url:"http://10.8.0.6:50080"
@@ -1113,7 +1128,7 @@ async function fetchIvuData() {
                         </div>
                         
                         </div>
-                        { ((window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" )) && 
+                        { ((window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" ||window.location.origin === "https://rakuraku.nichi.in")) && 
                           (
                         <div className="flex items-center">
                         <ButtonRounded
