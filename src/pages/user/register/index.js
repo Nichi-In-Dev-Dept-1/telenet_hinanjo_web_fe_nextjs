@@ -21,6 +21,7 @@ import {
   compareAddresses,
   geocodeAddressAndExtractData,
   extractAddress,
+  fetchIvuResponse,
 } from "@/helper";
 import {
   Button,
@@ -858,6 +859,57 @@ const handleScan = async () => {
   };
 
   const ivuResult = async () => {
+    if(window.location.origin === "https://rakuraku.nichi.in"){
+      try{
+        setLoader(true);
+      const res = await fetchIvuResponse();
+      if (res) {
+        const evacueeArray = res;
+        let newEvacuee = createEvacuee(evacueeArray);
+        newEvacuee = {
+          ...newEvacuee,
+          isFromFormReader: true
+        };
+        if (!newEvacuee.postalCode || !evacueeArray.prefecture_id) {
+          const address = evacueeArray.fullAddress || evacueeArray.address;
+          try {
+            const { prefecture, postalCode, prefecture_id } = await geocodeAddressAndExtractData(address, localeJson, locale, setLoader);
+
+            // Update newEvacuee with geocoding data
+            newEvacuee = {
+              ...newEvacuee,
+              postalCode: postalCode,
+              prefecture_id: prefecture_id
+            };
+          } catch (error) {
+            console.error("Error fetching geolocation data:", error);
+          }
+        }
+        setEditObj(newEvacuee)
+        setRegisterModalAction("edit");
+        setSpecialCareEditOpen(true);
+        setEvacuee((prev) => {
+          return [
+            ...prev, // Use spread operator to include previous items in the array
+            newEvacuee, // Add the newEvacuee to the array
+          ];
+        });
+        formikRef.current.setFieldValue("evacuee", [
+          ...formikRef.current.values.evacuee,
+          newEvacuee,
+        ]);
+        setLoader(false);
+      } else {
+        setLoader(false);
+      }
+      }
+      catch(err) {
+        setLoader(false)
+        console.log(err)
+
+      }
+    }
+    else {
     setLoader(true);
     let payload = {
       client_url:"http://10.8.0.6:50080"
@@ -903,6 +955,7 @@ const handleScan = async () => {
         setLoader(false);
       }
     });
+  }
   };
 
   const handleRecordingStateChange = (isRecord) => {
