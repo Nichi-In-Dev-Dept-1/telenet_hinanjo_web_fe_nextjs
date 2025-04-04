@@ -1031,6 +1031,9 @@ function calculateDOBAge(birthdate) {
             return response;
         }
     } catch (error) {
+        toast.error(error?.message,{
+            position:'top-right'
+        })
         console.error("Error occurred:", error.message);
     }
 }
