@@ -492,6 +492,7 @@ async function fetchIvuData() {
   const ivuResult = async() => {
     if(window.location.origin === "https://rakuraku.nichi.in"){
       try{
+        setLoader(true);
       const evacueeArray = await fetchIvuResponse();
       formikRef.current.resetForm();
       createEvacuee(evacueeArray, formikRef.current.setFieldValue);
@@ -499,6 +500,7 @@ async function fetchIvuData() {
       return
       }
       catch(err) {
+        setLoader(false)
         console.log(err)
 
       }
