@@ -378,6 +378,36 @@ const handleScan = async () => {
     }
   }, [count]);
 
+  const createEditObj = (rowData) => {
+    let currentData = {
+      id: rowData.id,
+      checked: rowData.checked,
+      name: rowData.name,
+      name_furigana: rowData.name_furigana,
+      dob: rowData.dob,
+      age: rowData.age,
+      age_m: rowData.age_m,
+      gender: rowData.gender,
+      postalCode: rowData.postalCode ? rowData.postalCode?.replace(/-/g, "") : null,
+      prefecture_id: rowData.prefecture_id,
+      address: rowData.address,
+      tel: rowData.tel,
+      // address2: rowData.address2,
+      email: rowData.email,
+      evacuee: rowData.evacuee,
+      password: rowData.password,
+      specialCareType: rowData.specialCareType,
+      connecting_code: rowData.connecting_code,
+      remarks: rowData.remarks,
+      individualQuestions:
+        rowData.individualQuestions,
+      family_register_from: rowData.family_register_from,
+      telAsRep: rowData.telAsRep,
+      addressAsRep: rowData.addressAsRep
+    };
+    setEditObj(currentData);
+  }
+
   const agreeTextWithHTML = (
     <div>
       {translate(localeJson, "agree_note_oneA")}
@@ -2629,7 +2659,22 @@ async function fetchIvuData() {
                                 };
                                 setEditObj(currentData);
                               }
-
+                               const evacueesWithNullAnswer = values.evacuee.filter((evacuee, index) => {
+                                                              const hasNullAnswer = evacuee?.individualQuestions?.some(
+                                                                (question) =>{
+                                                                  console.log(question)
+                                                                 return question.isRequired == "1" && (question.answer == null || question.answer.length == 0)
+                               });
+                                                              return hasNullAnswer;
+                                                            });
+                                                            if (evacueesWithNullAnswer?.length > 0) {
+                                                              let rowData = evacueesWithNullAnswer[0];
+                                                              createEditObj(rowData)
+                                                              setRegisterModalAction("edit");
+                                                              setSpecialCareEditOpen(true);
+                                                              hideOverFlow();
+                                                              return
+                                                            }
                               handleSubmit();
                             },
                           }}

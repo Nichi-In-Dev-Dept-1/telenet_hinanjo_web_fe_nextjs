@@ -979,6 +979,20 @@ async function fetchIvuData() {
                     handleConfirmation();
                   } else {
                     close();
+                    if (props.registerModalAction == "edit") {
+                      let updatedValues = { ...editObj };
+
+                      const hasNullAnswer = updatedValues?.individualQuestions?.some(
+                        (question) =>
+                          (question?.answer != null && question?.answer?.length != 0)
+                      );
+                      // Update the other values
+                      updatedValues = {
+                        ...updatedValues,
+                        individualQuestions: hasNullAnswer ? updatedValues?.individualQuestions : initialQuestion,
+                      };
+                      setEvacueeValues(updatedValues);
+                    }
                     setQuestions(initialQuestion);
                     setIsFormSubmitted(false);
                     setModalCountFlag(false);
@@ -1038,6 +1052,20 @@ async function fetchIvuData() {
                             handleConfirmation();
                           } else {
                             close();
+                            if (props.registerModalAction == "edit") {
+                              let updatedValues = { ...editObj };
+        
+                              const hasNullAnswer = updatedValues?.individualQuestions?.some(
+                                (question) =>
+                                  (question?.answer != null && question?.answer?.length != 0)
+                              );
+                              // Update the other values
+                              updatedValues = {
+                                ...updatedValues,
+                                individualQuestions: hasNullAnswer ? updatedValues?.individualQuestions : initialQuestion,
+                              };
+                              setEvacueeValues(updatedValues);
+                            }
                             setQuestions(initialQuestion);
                             setIsFormSubmitted(false);
                             setModalCountFlag(false);
