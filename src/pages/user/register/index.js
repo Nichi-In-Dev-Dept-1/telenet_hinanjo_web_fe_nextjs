@@ -21,6 +21,7 @@ import {
   compareAddresses,
   geocodeAddressAndExtractData,
   extractAddress,
+  fetchIvuResponse,
 } from "@/helper";
 import {
   Button,
@@ -376,6 +377,36 @@ const handleScan = async () => {
       }
     }
   }, [count]);
+
+  const createEditObj = (rowData) => {
+    let currentData = {
+      id: rowData.id,
+      checked: rowData.checked,
+      name: rowData.name,
+      name_furigana: rowData.name_furigana,
+      dob: rowData.dob,
+      age: rowData.age,
+      age_m: rowData.age_m,
+      gender: rowData.gender,
+      postalCode: rowData.postalCode ? rowData.postalCode?.replace(/-/g, "") : null,
+      prefecture_id: rowData.prefecture_id,
+      address: rowData.address,
+      tel: rowData.tel,
+      // address2: rowData.address2,
+      email: rowData.email,
+      evacuee: rowData.evacuee,
+      password: rowData.password,
+      specialCareType: rowData.specialCareType,
+      connecting_code: rowData.connecting_code,
+      remarks: rowData.remarks,
+      individualQuestions:
+        rowData.individualQuestions,
+      family_register_from: rowData.family_register_from,
+      telAsRep: rowData.telAsRep,
+      addressAsRep: rowData.addressAsRep
+    };
+    setEditObj(currentData);
+  }
 
   const agreeTextWithHTML = (
     <div>
@@ -858,6 +889,57 @@ const handleScan = async () => {
   };
 
   const ivuResult = async () => {
+    if(window.location.origin === "https://rakuraku.nichi.in"){
+      try{
+        setLoader(true);
+      const res = await fetchIvuResponse();
+      if (res) {
+        const evacueeArray = res;
+        let newEvacuee = createEvacuee(evacueeArray);
+        newEvacuee = {
+          ...newEvacuee,
+          isFromFormReader: true
+        };
+        if (!newEvacuee.postalCode || !evacueeArray.prefecture_id) {
+          const address = evacueeArray.fullAddress || evacueeArray.address;
+          try {
+            const { prefecture, postalCode, prefecture_id } = await geocodeAddressAndExtractData(address, localeJson, locale, setLoader);
+
+            // Update newEvacuee with geocoding data
+            newEvacuee = {
+              ...newEvacuee,
+              postalCode: postalCode,
+              prefecture_id: prefecture_id
+            };
+          } catch (error) {
+            console.error("Error fetching geolocation data:", error);
+          }
+        }
+        setEditObj(newEvacuee)
+        setRegisterModalAction("edit");
+        setSpecialCareEditOpen(true);
+        setEvacuee((prev) => {
+          return [
+            ...prev, // Use spread operator to include previous items in the array
+            newEvacuee, // Add the newEvacuee to the array
+          ];
+        });
+        formikRef.current.setFieldValue("evacuee", [
+          ...formikRef.current.values.evacuee,
+          newEvacuee,
+        ]);
+        setLoader(false);
+      } else {
+        setLoader(false);
+      }
+      }
+      catch(err) {
+        setLoader(false)
+        console.log(err)
+
+      }
+    }
+    else {
     setLoader(true);
     let payload = {
       client_url:"http://10.8.0.6:50080"
@@ -903,6 +985,7 @@ const handleScan = async () => {
         setLoader(false);
       }
     });
+  }
   };
 
   const handleRecordingStateChange = (isRecord) => {
@@ -1394,7 +1477,7 @@ async function fetchIvuData() {
                           <i className="custom-target-icon-2 pi pi-info-circle"></i>
                         </div>
                       </div>
-                      { (window.location.pathname.startsWith('/user/register') &&(window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" )) && 
+                      { (window.location.pathname.startsWith('/user/register') &&(window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" || window.location.origin === "https://rakuraku.nichi.in" )) && 
                           (
                       <div className="flex items-center">
                         <ButtonRounded
@@ -2576,7 +2659,22 @@ async function fetchIvuData() {
                                 };
                                 setEditObj(currentData);
                               }
-
+                               const evacueesWithNullAnswer = values.evacuee.filter((evacuee, index) => {
+                                                              const hasNullAnswer = evacuee?.individualQuestions?.some(
+                                                                (question) =>{
+                                                                  console.log(question)
+                                                                 return question.isRequired == "1" && (question.answer == null || question.answer.length == 0)
+                               });
+                                                              return hasNullAnswer;
+                                                            });
+                                                            if (evacueesWithNullAnswer?.length > 0) {
+                                                              let rowData = evacueesWithNullAnswer[0];
+                                                              createEditObj(rowData)
+                                                              setRegisterModalAction("edit");
+                                                              setSpecialCareEditOpen(true);
+                                                              hideOverFlow();
+                                                              return
+                                                            }
                               handleSubmit();
                             },
                           }}

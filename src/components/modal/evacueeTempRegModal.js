@@ -12,6 +12,7 @@ import {
   compareAddresses,
   geocodeAddressAndExtractData,
   extractAddress,
+  fetchIvuResponse,
   // transformData,
 } from "@/helper";
 import {
@@ -488,7 +489,22 @@ async function fetchIvuData() {
     });
   };
 
-  const ivuResult = () => {
+  const ivuResult = async() => {
+    if(window.location.origin === "https://rakuraku.nichi.in"){
+      try{
+        setLoader(true);
+      const evacueeArray = await fetchIvuResponse();
+      formikRef.current.resetForm();
+      createEvacuee(evacueeArray, formikRef.current.setFieldValue);
+      setLoader(false);
+      return
+      }
+      catch(err) {
+        setLoader(false)
+        console.log(err)
+
+      }
+    }
     setLoader(true);
     let payload = {
       client_url:"http://10.8.0.6:50080"
@@ -963,6 +979,20 @@ async function fetchIvuData() {
                     handleConfirmation();
                   } else {
                     close();
+                    if (props.registerModalAction == "edit") {
+                      let updatedValues = { ...editObj };
+
+                      const hasNullAnswer = updatedValues?.individualQuestions?.some(
+                        (question) =>
+                          (question?.answer != null && question?.answer?.length != 0)
+                      );
+                      // Update the other values
+                      updatedValues = {
+                        ...updatedValues,
+                        individualQuestions: hasNullAnswer ? updatedValues?.individualQuestions : initialQuestion,
+                      };
+                      setEvacueeValues(updatedValues);
+                    }
                     setQuestions(initialQuestion);
                     setIsFormSubmitted(false);
                     setModalCountFlag(false);
@@ -1022,6 +1052,20 @@ async function fetchIvuData() {
                             handleConfirmation();
                           } else {
                             close();
+                            if (props.registerModalAction == "edit") {
+                              let updatedValues = { ...editObj };
+        
+                              const hasNullAnswer = updatedValues?.individualQuestions?.some(
+                                (question) =>
+                                  (question?.answer != null && question?.answer?.length != 0)
+                              );
+                              // Update the other values
+                              updatedValues = {
+                                ...updatedValues,
+                                individualQuestions: hasNullAnswer ? updatedValues?.individualQuestions : initialQuestion,
+                              };
+                              setEvacueeValues(updatedValues);
+                            }
                             setQuestions(initialQuestion);
                             setIsFormSubmitted(false);
                             setModalCountFlag(false);
@@ -1113,7 +1157,7 @@ async function fetchIvuData() {
                         </div>
                         
                         </div>
-                        { ((window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" )) && 
+                        { ((window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" ||window.location.origin === "https://rakuraku.nichi.in")) && 
                           (
                         <div className="flex items-center">
                         <ButtonRounded

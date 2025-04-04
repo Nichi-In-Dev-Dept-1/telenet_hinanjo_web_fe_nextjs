@@ -4,7 +4,7 @@ import { isObject, isArray } from "lodash";
 import { Button } from "@/components";
 // import _ from 'lodash';
 import { prefectures, prefecturesCombined, prefectures_en } from '@/utils/constant';
-import { QRCodeCreateServices } from "@/services";
+import { CommonServices, QRCodeCreateServices } from "@/services";
 
 
 const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
@@ -1016,3 +1016,325 @@ function calculateDOBAge(birthdate) {
     }
     return { years, months };
   }
+
+  export async function fetchIvuResponse() {
+    try {
+        const request = {
+            client_url: "http://127.0.0.1:50080", // Replace with actual API endpoint
+            card_type: "MYNUMBER", // Initial card type
+        };
+
+        const response = await ivuApi(request);
+        if(response)
+        {
+            console.log("Final extracted data:", response);
+            return response;
+        }
+    } catch (error) {
+        toast.error(error?.message,{
+            position:'top-right'
+        })
+        console.error("Error occurred:", error.message);
+    }
+}
+
+  
+/**
+ * ivuApi
+ * @description IVU API to read identity card data
+ * @param {Object} request - The request object with the following properties:
+ *   - card_type: The type of the card to read. Allowed values are "MYNUMBER" and "DRVLIC".
+ * @returns {Promise<Object>} The response object with the following properties:
+ *   - card_type: The type of the card that was read.
+ *   - front: The front side image of the card.
+ *   - back: The back side image of the card.
+ *   - issue_date: The issue date of the card in the format "YYYYMMDD".
+ *   - expire_date: The expire date of the card in the format "YYYYMMDD".
+ *   - name: The name of the card holder.
+ *   - address: The address of the card holder.
+ *   - kana_name: The name of the card holder in Katakana.
+ *   - kana_address: The address of the card holder in Katakana.
+ *   - card_number: The number of the card.
+ *   - card_version: The version of the card.
+ *   - birth_date: The birth date of the card holder in the format "YYYYMMDD".
+ *   - gender: The gender of the card holder. Allowed values are "男性" and "女性".
+ *   - special_care: The special care status of the card holder. Allowed values are "有" and "無".
+ *   - prefecture_id: The prefecture id of the card holder.
+ *   - postal_code: The postal code of the card holder.
+ *   - refugee_name: The name of the refugee card holder.
+ * @throws {Error} If the API returns an error response.
+ */
+   async function ivuApi(request) {
+    request.card_type = "MYNUMBER";
+    await executeStep("CLEAR_RESULT", request);
+    await executeStep("INITIALIZE_STATUS", request);
+    
+    let initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE", request);
+    
+    if (!initialStatus?.result || initialStatus.result !== "OK") {
+        request.card_type = "DRVLIC";
+        initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE", request);
+        if (!initialStatus?.result || initialStatus.result !== "OK") {
+            throw new Error(initialStatus.text);
+        }
+    }
+    
+    console.info(`IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE status: ${initialStatus.result === "OK" ? "OK" : "FAILED"}`);
+    
+    const primarySteps = [
+        "IIA_IVD_RECOG",
+        "IVU_CMD_IDCARD_VERIFY",
+        "IVU_CMD_IDCARD_READ_FRONTSIDE",
+        "IVU_CMD_IDCARD_OUTPUT",
+        "GET_RECORD",
+        "CLEAR_RESULT"
+    ];
+    
+    const fallbackSteps = [
+        "INITIALIZE_STATUS",
+        "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE",
+        "IIA_IVD_RECOG",
+        "IVU_CMD_IDCARD_VERIFY",
+        "IVU_CMD_IDCARD_READ_FRONTSIDE",
+        "IVU_CMD_IDCARD_OUTPUT",
+        "GET_RECORD",
+        "CLEAR_RESULT"
+    ];
+    
+    const steps = initialStatus.result === "OK" ? primarySteps : fallbackSteps;
+    let data = {};
+    
+    for (const step of steps) {
+        if (step === "GET_RECORD") {
+            data = await processStepResponse(step, request);
+        } else {
+            const status = await executeStep(step, request);
+            if (!status?.result || (status.result !== "OK" && !(step === "IVU_CMD_IDCARD_OUTPUT" && request.card_type === "DRVLIC" && status.result === "NG"))) {
+                throw new Error(status.text);
+            }
+        }
+    }
+    
+    return data;
+  }
+  
+
+  /**
+   * Execute a step in the card recognition flow.
+   * 
+   * @param {string} command The command to execute.
+   * @param {object} request The request object containing the client URL and card type.
+   * @returns {Promise<object|Error>} The response from the server or an Error if the request fails.
+   * 
+   * @throws {Error} If the request fails or the server returns an error.
+   */
+  async function executeStep(command, request) {
+    let prefix = command === "IIA_IVD_RECOG" ? "gmapi" : "ivuapi";
+    const url = `${request.client_url}/${prefix}/${command}`;
+  
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(getParameters(command, request.card_type))
+        });
+  
+        const data = await response.json();
+  
+        // Handle special case for "IIA_IVD_RECOG"
+        if (request.card_type === "MYNUMBER" && command === "IIA_IVD_RECOG") {
+            const pin = data?.output?.Pin14OfMNC || null;
+            const status = await executeSetPin(pin, request);
+            if (!status?.result || status.result !== "OK") {
+                throw new Error(status.text);
+            }
+            return status;
+        }
+  
+        return data;
+    } catch (error) {
+        console.error(`Error executing ${command}:`, error);
+        throw new Error(`Failed to execute ${command}`);
+    }
+  }
+  
+  
+  /**
+   * Process the response of a step in the card recognition flow.
+   * 
+   * @param {string} command The command that was executed.
+   * @param {object} request The request object containing the client URL and card type.
+   * @returns {Promise<object|Error>} The response data or an Error if the request fails.
+   * 
+   * @throws {Error} If the request fails or the server returns an error.
+   */
+  async function processStepResponse(command, request) {
+    const url = `${request.client_url}/ivuapi/${command}`;
+  
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(getParameters(command, request.card_type))
+        });
+  
+        const data = await response.json();
+        console.info(`${command} response:`, data);
+  
+        if (command === "GET_RECORD") {
+            return await extractDataFromRecordResponse(data);
+        }
+  
+        return {};
+    } catch (error) {
+        console.error(`Error executing ${command}:`, error);
+        throw new Error(`Failed to execute ${command}`);
+    }
+  }
+  
+  /**
+   * Execute the SET_PIN command to set the PIN for the current MYNUMBER card.
+   * 
+   * @param {string} pin The PIN to set.
+   * @param {object} request The request object containing the client URL and card type.
+   * @returns {Promise<object|Error>} The response from the server or an Error if the request fails.
+   * 
+   * @throws {Error} If the request fails or the server returns an error.
+   */
+  async function executeSetPin(pin, request) {
+    const url = `${request.client_url}/ivuapi/SET_PIN`;
+  
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ pin_type: "MYNUMBER_PINB_14", data: pin })
+        });
+  
+        const data = await response.json();
+        console.info("SET_PIN response:", data);
+  
+        return data;
+    } catch (error) {
+        console.error("Error executing SET_PIN:", error);
+        throw new Error("Failed to execute SET_PIN");
+    }
+  }
+  
+  
+  /**
+   * Extracts the relevant data from the response of the GET_RECORD command.
+   * 
+   * @param {object} response The response object from the server.
+   * @returns {object} An object containing the extracted data.
+   * 
+   * @property {string} fullAddress The full address of the person.
+   * @property {string} address The address of the person, formatted as a CSV string.
+   * @property {number} age The age of the person.
+   * @property {string} dob The date of birth of the person.
+   * @property {string} Gaiji The Gaiji of the person.
+   * @property {string} name The name of the person.
+   * @property {string} refugeeName The Katakana name of the person.
+   * @property {string} gender The gender of the person.
+   * @property {string} TuikiIC The TuikiIC of the person.
+   */
+  async function extractDataFromRecordResponse(response) {
+    const holderInfo = response?.output?.IDCARD_OUTPUT?.HolderInfo || {};
+    return {
+        fullAddress: holderInfo.Address || null,
+        address: holderInfo.Address?handleAddressCSV( holderInfo.Address) : null,
+        age: holderInfo.Age || null,
+        dob: holderInfo.DayOfBirth || null,
+        Gaiji: holderInfo.Gaiji || null,
+        name: holderInfo.Name1 ? holderInfo.Name1 : null,
+        refugeeName: holderInfo.Name1 ? await convertNameToKatakana(holderInfo.Name1) : null,
+        gender: holderInfo.Sexuality || null,
+        TuikiIC: holderInfo.TuikiIC || null,
+    };
+  }
+  
+/**
+ * Retrieves the parameters associated with a specific command and card type.
+ * 
+ * @param {string} command - The command for which parameters are needed.
+ * @param {string} card_type - The type of card being processed.
+ * @returns {object} An object containing parameters for the specified command. 
+ *                   Returns an empty object if the command is not recognized.
+ * 
+ * Available commands and their parameters:
+ * - LOCK: Locks the application with a specific name.
+ * - IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE: Reads the front side image of the ID card.
+ * - IIA_IVD_RECOG: Recognizes the ID card.
+ * - IVU_CMD_IDCARD_VERIFY: Verifies the ID card with a specified mode.
+ * - IVU_CMD_IDCARD_READ_FRONTSIDE: Reads the front side of the ID card.
+ * - IVU_CMD_IDCARD_OUTPUT: Outputs card information with specific flags.
+ * - GET_RECORD: Retrieves the record of a target person.
+ * - UNLOCK: Unlocks the application with a specific name.
+ * - CLEAR_RESULT: Clears the result for a target person.
+ * - IVU_CMD_LIGHT_CONTROL: Controls the light indicator with specified settings.
+ * - IVU_CMD_PICR_POLLING: Polls the card in AUTO mode for a target person.
+ * - IVU_CMD_PICR_CHECK: Checks the card in BOTH mode with a timeout.
+ */
+
+  function getParameters(command, card_type) {
+    const params = {
+        LOCK: { app_name: "test_app" },
+        IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE: { card_type },
+        IIA_IVD_RECOG: { card_type },
+        IVU_CMD_IDCARD_VERIFY: { card_type, mode: "VERIFY" },
+        IVU_CMD_IDCARD_READ_FRONTSIDE: { card_type },
+        IVU_CMD_IDCARD_OUTPUT: { output_flags: "TokuteiInfo|CardInfo" },
+        GET_RECORD: { person: "TARGET" },
+        UNLOCK: { app_name: "test_app" },
+        CLEAR_RESULT: { person: "TARGET" },
+        IVU_CMD_LIGHT_CONTROL: { light_target: "INDICATOR", power: 255, mode: "SQUARE", length: 2000 },
+        IVU_CMD_PICR_POLLING: { card_type:"AUTO", mode: "IC", person: "TARGET", timeout: 20000 },
+        IVU_CMD_PICR_CHECK: { mode: "BOTH", timeout: 20000 }
+    };
+    return params[command] || {};
+  }
+  
+  /**
+   * Converts a given address string from a CSV file to a standard format used
+   * in the application. The standard format is:
+   *   Prefecture + City + Address
+   * The function tries to extract Prefecture, City and Address from the given
+   * string by matching a regular expression. If the string does not match the
+   * regular expression, the original string is returned.
+   * @param {string} address - The address string from a CSV file.
+   * @returns {string} The standardized address string.
+   */
+  function handleAddressCSV(address) {
+    const regex = /^(.{2,3}?[都道府県])(.+?郡.+?[町村]|.+?市.+?区|.+?[市区町村])(.+)/u;
+    const matches = address.match(regex);
+    if (!matches) {
+        return address;
+    }
+    return matches[2] + matches[3];
+  }
+
+  /**
+   * Converts a given string to Katakana.
+   * The function uses an external service to convert the string, and returns
+   * the converted string without any spaces.
+   * If the conversion fails, the function returns an empty string.
+   * @param {string} text - The string to be converted.
+   * @returns {string} The converted string in Katakana without any spaces.
+   */
+  async function convertNameToKatakana(text) {
+    return new Promise((resolve) => {
+        CommonServices.convertToKatakana(text, (res) => {
+            if (res) {
+                resolve(res.converted);
+            } else {
+                resolve("");
+            }
+        });
+    });
+}
