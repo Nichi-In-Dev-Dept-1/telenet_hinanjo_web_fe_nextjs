@@ -835,7 +835,7 @@ const handleScan = async () => {
            const address = evacueeArray.fullAddress || evacueeArray.address;
            try {
              const { prefecture, postalCode, prefecture_id } = await geocodeAddressAndExtractData(address, localeJson, locale, setLoader);
-             
+
              // Update newEvacuee with geocoding data
              newEvacuee = {
                ...newEvacuee,
@@ -1236,7 +1236,7 @@ async function fetchIvuData() {
                           <i className="custom-target-icon-2 pi pi-info-circle"></i>
                         </div>
                       </div>
-                      { ((window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" )) && 
+                      { ((window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000"|| window.location.origin === "https://rakuraku.nichi.in" )) && 
                           (
                       <div className="flex items-center">
                         <ButtonRounded
