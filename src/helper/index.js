@@ -1253,7 +1253,7 @@ function calculateDOBAge(birthdate) {
         dob: holderInfo.DayOfBirth || null,
         Gaiji: holderInfo.Gaiji || null,
         name: holderInfo.Name1 ? holderInfo.Name1 : null,
-        refugeeName: holderInfo.Name1 ? await convertNameToKatakana(holderInfo.Name1) : null,
+        refugeeName: holderInfo.Name1 ? "" : null,
         gender: holderInfo.Sexuality || null,
         TuikiIC: holderInfo.TuikiIC || null,
     };
