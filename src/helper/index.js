@@ -1084,7 +1084,7 @@ function calculateDOBAge(birthdate) {
     const primarySteps = [
         "IIA_IVD_RECOG",
         "IVU_CMD_IDCARD_VERIFY",
-        "IVU_CMD_IDCARD_READ_FRONTSIDE",
+        //"IVU_CMD_IDCARD_READ_FRONTSIDE",
         "IVU_CMD_IDCARD_OUTPUT",
         "GET_RECORD",
         "CLEAR_RESULT"
