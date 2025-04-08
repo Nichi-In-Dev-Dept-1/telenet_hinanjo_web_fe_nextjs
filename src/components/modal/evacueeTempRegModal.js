@@ -13,6 +13,7 @@ import {
   geocodeAddressAndExtractData,
   extractAddress,
   fetchIvuResponse,
+  convertNameToKatakana,
   // transformData,
 } from "@/helper";
 import {
@@ -322,6 +323,13 @@ export default function EvacueeTempRegModal(props) {
         }
       }, 1000);
       setFetchedZipCode(editObj.postalCode)
+
+        // Auto-fill furigana if needed
+  if (!editObj?.refugeeName && editObj.name) {
+    convertNameToKatakana(editObj.name).then((katakana) => {
+      formikRef.current.setFieldValue("name_furigana", katakana);
+    });
+  }
       
       if(editObj?.postalCode)
       {
@@ -535,8 +543,6 @@ async function fetchIvuData() {
       }
     }
     setFieldValue("name", evacuees.name || "");
-    setFieldValue("name_furigana", (evacuees.refugeeName || evacuees.refugee_name) || "");
-    // setFieldValue("age", evacuees.age || "");
     // setFieldValue("age_m", evacuees.month || "");
     setFieldValue("gender", evacuees.gender ? parseInt(evacuees.gender) : "");
     setFieldValue("tel", evacuees.tel || "");
@@ -582,6 +588,11 @@ async function fetchIvuData() {
       setFieldValue("dob", convertedObject || "");
     }
     setFieldValue("connecting_code", evacuees.connecting_code);
+    evacuees.refugeeName
+  ? setFieldValue("name_furigana", evacuees.refugeeName)
+  : convertNameToKatakana(evacuees.name).then(katakana => setFieldValue("name_furigana", katakana));
+
+    // setFieldValue("age", evacuees.age || "");
   }
 
   function calculateAge(birthdate) {
