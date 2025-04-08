@@ -1327,7 +1327,7 @@ function calculateDOBAge(birthdate) {
    * @param {string} text - The string to be converted.
    * @returns {string} The converted string in Katakana without any spaces.
    */
-  async function convertNameToKatakana(text) {
+  export async function convertNameToKatakana(text) {
     return new Promise((resolve) => {
         CommonServices.convertToKatakana(text, (res) => {
             if (res) {
