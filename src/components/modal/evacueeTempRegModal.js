@@ -325,7 +325,7 @@ export default function EvacueeTempRegModal(props) {
       setFetchedZipCode(editObj.postalCode)
 
         // Auto-fill furigana if needed
-  if (!editObj?.refugeeName && editObj.name) {
+  if (!editObj?.name_furigana && editObj.name) {
     convertNameToKatakana(editObj.name).then((katakana) => {
       formikRef.current.setFieldValue("name_furigana", katakana);
     });
