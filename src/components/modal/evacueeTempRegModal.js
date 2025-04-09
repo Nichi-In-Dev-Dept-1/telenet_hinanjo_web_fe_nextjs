@@ -327,7 +327,7 @@ export default function EvacueeTempRegModal(props) {
         // Auto-fill furigana if needed
   if (!editObj?.name_furigana && editObj.name) {
     convertNameToKatakana(editObj.name).then((katakana) => {
-      formikRef.current.setFieldValue("name_furigana", katakana);
+      formikRef.current.setFieldValue("name_furigana",formikRef.current?.values?.name_furigana || katakana);
     });
   }
       
