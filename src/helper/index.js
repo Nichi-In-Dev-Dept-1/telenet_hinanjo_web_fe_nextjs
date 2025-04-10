@@ -1074,6 +1074,10 @@ function calculateDOBAge(birthdate) {
     if (!initialStatus?.result || initialStatus.result !== "OK") {
         request.card_type = "DRVLIC";
         initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE", request);
+    }
+
+    if (!initialStatus?.result || initialStatus.result !== "OK") {
+        initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE", request);
         if (!initialStatus?.result || initialStatus.result !== "OK") {
             throw new Error(initialStatus.text);
         }
