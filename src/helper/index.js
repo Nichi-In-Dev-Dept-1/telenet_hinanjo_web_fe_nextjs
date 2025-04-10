@@ -1038,6 +1038,13 @@ function calculateDOBAge(birthdate) {
     }
 }
 
+async function tryReadCard(request, cardType, command) {
+    request.card_type = cardType;
+    await executeStep("CLEAR_RESULT", request);
+    await executeStep("INITIALIZE_STATUS", request);
+    return await executeStep(command, request);
+}
+
   
 /**
  * ivuApi
@@ -1066,26 +1073,21 @@ function calculateDOBAge(birthdate) {
  */
    async function ivuApi(request) {
     request.card_type = "MYNUMBER";
-    await executeStep("CLEAR_RESULT", request);
-    await executeStep("INITIALIZE_STATUS", request);
+    // await executeStep("CLEAR_RESULT", request);
+    // await executeStep("INITIALIZE_STATUS", request);
     
-    let initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE", request);
-    
-    if (!initialStatus?.result || initialStatus.result !== "OK") {
-        request.card_type = "DRVLIC";
-        await executeStep("CLEAR_RESULT", request);
-        await executeStep("INITIALIZE_STATUS", request);
-        initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE", request);
-    }
+    let initialStatus = await tryReadCard(request, "MYNUMBER", "IVU_CMD_IDCARD_READ_FRONTSIDE");
 
-    if (!initialStatus?.result || initialStatus.result !== "OK") {
-        await executeStep("CLEAR_RESULT", request);
-        await executeStep("INITIALIZE_STATUS", request);
-        initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE", request);
         if (!initialStatus?.result || initialStatus.result !== "OK") {
-            throw new Error(initialStatus.text);
+             initialStatus = await tryReadCard(request, "DRVLIC", "IVU_CMD_IDCARD_READ_FRONTSIDE");
         }
+
+        if (!initialStatus?.result || initialStatus.result !== "OK") {
+        initialStatus = await tryReadCard(request, "MYNUMBER", "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE");
+       if (!initialStatus?.result || initialStatus.result !== "OK") {
+        throw new Error(initialStatus.text || "Card reading failed.");
     }
+}
     
     console.info(`IVU_CMD_IDCARD_READ_FRONTSIDE status: ${initialStatus.result === "OK" ? "OK" : "FAILED"}`);
     
