@@ -1069,17 +1069,17 @@ function calculateDOBAge(birthdate) {
     await executeStep("CLEAR_RESULT", request);
     await executeStep("INITIALIZE_STATUS", request);
     
-    let initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE", request);
+    let initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE", request);
     
     if (!initialStatus?.result || initialStatus.result !== "OK") {
         request.card_type = "DRVLIC";
-        initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE", request);
+        initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE", request);
         if (!initialStatus?.result || initialStatus.result !== "OK") {
             throw new Error(initialStatus.text);
         }
     }
     
-    console.info(`IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE status: ${initialStatus.result === "OK" ? "OK" : "FAILED"}`);
+    console.info(`IVU_CMD_IDCARD_READ_FRONTSIDE status: ${initialStatus.result === "OK" ? "OK" : "FAILED"}`);
     
     const primarySteps = [
         "IIA_IVD_RECOG",
@@ -1092,10 +1092,9 @@ function calculateDOBAge(birthdate) {
     
     const fallbackSteps = [
         "INITIALIZE_STATUS",
-        "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE",
+        "IVU_CMD_IDCARD_READ_FRONTSIDE",
         "IIA_IVD_RECOG",
         "IVU_CMD_IDCARD_VERIFY",
-        "IVU_CMD_IDCARD_READ_FRONTSIDE",
         "IVU_CMD_IDCARD_OUTPUT",
         "GET_RECORD",
         "CLEAR_RESULT"

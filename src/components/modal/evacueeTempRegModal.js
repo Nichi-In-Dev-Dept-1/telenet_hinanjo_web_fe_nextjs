@@ -498,35 +498,32 @@ async function fetchIvuData() {
   };
 
   const ivuResult = async() => {
-    if(window.location.origin === "https://rakuraku.nichi.in"){
       try{
-        setLoader(true);
+      setLoader(true);
       const evacueeArray = await fetchIvuResponse();
       formikRef.current.resetForm();
       createEvacuee(evacueeArray, formikRef.current.setFieldValue);
       setLoader(false);
-      return
       }
       catch(err) {
         setLoader(false)
         console.log(err)
 
       }
-    }
-    setLoader(true);
-    let payload = {
-      client_url:"http://10.8.0.6:50080"
-    }
-    ivuToolRegistration(payload, (res) => {
-      if (res) {
-        const evacueeArray = res.data.data;
-        formikRef.current.resetForm();
-        createEvacuee(evacueeArray, formikRef.current.setFieldValue);
-        setLoader(false);
-      } else {
-        setLoader(false);
-      }
-    });
+    // setLoader(true);
+    // let payload = {
+    //   client_url:"http://10.8.0.6:50080"
+    // }
+    // ivuToolRegistration(payload, (res) => {
+    //   if (res) {
+    //     const evacueeArray = res.data.data;
+    //     formikRef.current.resetForm();
+    //     createEvacuee(evacueeArray, formikRef.current.setFieldValue);
+    //     setLoader(false);
+    //   } else {
+    //     setLoader(false);
+    //   }
+    // });
   }
 
   async function createEvacuee(evacuees, setFieldValue) {
