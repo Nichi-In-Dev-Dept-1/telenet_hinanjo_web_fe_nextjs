@@ -1069,10 +1069,12 @@ function calculateDOBAge(birthdate) {
     await executeStep("CLEAR_RESULT", request);
     await executeStep("INITIALIZE_STATUS", request);
     
-    let initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE", request);
+    let initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE", request);
     
     if (!initialStatus?.result || initialStatus.result !== "OK") {
         request.card_type = "DRVLIC";
+        await executeStep("CLEAR_RESULT", request);
+        await executeStep("INITIALIZE_STATUS", request);
         initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE", request);
     }
 
