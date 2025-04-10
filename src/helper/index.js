@@ -1079,6 +1079,8 @@ function calculateDOBAge(birthdate) {
     }
 
     if (!initialStatus?.result || initialStatus.result !== "OK") {
+        await executeStep("CLEAR_RESULT", request);
+        await executeStep("INITIALIZE_STATUS", request);
         initialStatus = await executeStep("IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE", request);
         if (!initialStatus?.result || initialStatus.result !== "OK") {
             throw new Error(initialStatus.text);
