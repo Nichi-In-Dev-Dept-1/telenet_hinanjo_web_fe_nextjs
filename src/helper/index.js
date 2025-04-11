@@ -1104,7 +1104,6 @@ function calculateDOBAge(birthdate) {
     const primarySteps = [
         "CLEAR_RESULT",
         "INITIALIZE_STATUS",
-        "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE",
         "IIA_IVD_RECOG",
         "IVU_CMD_IDCARD_VERIFY",
         "IVU_CMD_IDCARD_READ_FRONTSIDE",
@@ -1123,6 +1122,12 @@ function calculateDOBAge(birthdate) {
         "GET_RECORD",
         "CLEAR_RESULT"
     ];
+
+    if (request.card_type === "DRVLIC") {
+        // Add the extra step only for 'driv' card_type
+        primarySteps.splice(3, 0, "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE"); 
+        // This adds it at index 3, right before "IIA_IVD_RECOG"
+    }
     
     // Decide steps based on success
     const steps = primarySteps;
