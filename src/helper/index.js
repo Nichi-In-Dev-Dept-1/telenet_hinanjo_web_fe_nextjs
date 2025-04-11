@@ -1110,6 +1110,8 @@ async function ivuApi(request) {
                 }
             }
         } catch (error) {
+
+            console.log(error)
             // Only rethrow if error.command is SET_PIN or GET_RECORD
             if (error.command === "SET_PIN" || error.command === "GET_RECORD") {
                 throw error;
