@@ -1231,7 +1231,7 @@ async function ivuApi(request) {
         return data;
     } catch (error) {
         console.error("Error executing SET_PIN:", error);
-        throw new Error("SET_PIN API call failed");
+        throw new Error(error.text);
     }
 }
 
