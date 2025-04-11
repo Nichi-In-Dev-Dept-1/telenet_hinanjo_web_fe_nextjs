@@ -1046,6 +1046,13 @@ function calculateDOBAge(birthdate) {
 //     return await executeStep(command, request);
 // }
 
+function throwErrorWithCommand(message, command) {
+    const error = new Error(message || `${command} failed`);
+    error.command = command;
+    throw error;
+}
+
+
   
 /**
  * ivuApi
@@ -1073,7 +1080,7 @@ function calculateDOBAge(birthdate) {
  * @throws {Error} If the API returns an error response.
  */
 async function ivuApi(request) {
-    const primarySteps = [
+    const steps = [
         "CLEAR_RESULT",
         "INITIALIZE_STATUS",
         "IVU_CMD_IDCARD_READ_FRONTSIDE",
@@ -1085,37 +1092,36 @@ async function ivuApi(request) {
     ];
 
     if (request.card_type === "DRVLIC") {
-        primarySteps.splice(3, 0, "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE");
+        steps.splice(3, 0, "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE");
     }
 
     let data = {};
 
-    for (const step of primarySteps) {
+    for (const step of steps) {
         try {
             if (step === "GET_RECORD") {
                 data = await processStepResponse(step, request);
             } else {
-                const status = await executeStep(step, request);
-
-                if (
-                    !status?.result ||
-                    (status.result !== "OK" &&
-                        !(step === "IVU_CMD_IDCARD_OUTPUT" &&
-                          request.card_type === "DRVLIC" &&
-                          status.result === "NG"))
-                ) {
-                    throw new Error(status?.text || `${step} failed`);
+                const status = await executeStep(step, request, step);
+                if (!status?.result || status.result !== "OK") {
+                    if (step === "GET_RECORD") {
+                        throwErrorWithCommand(status.text, "GET_RECORD");
+                    }
                 }
             }
         } catch (error) {
-            const failedStep = error?.step || step;
-            console.error(`Step "${failedStep}" failed:`, error);
-            throw new Error(`Step "${failedStep}" failed: ${error.message}`);
+            // Only rethrow if error.command is SET_PIN or GET_RECORD
+            if (error.command === "SET_PIN" || error.command === "GET_RECORD") {
+                throw error;
+            } else {
+                console.warn(`Ignored error at ${step}: ${error.message}`);
+            }
         }
     }
 
     return data;
 }
+
 
 
   /**
@@ -1127,30 +1133,26 @@ async function ivuApi(request) {
    * 
    * @throws {Error} If the request fails or the server returns an error.
    */
-  async function executeStep(command, request) {
-    let prefix = command === "IIA_IVD_RECOG" ? "gmapi" : "ivuapi";
+  async function executeStep(command, request, outerStep) {
+    const prefix = command === "IIA_IVD_RECOG" ? "gmapi" : "ivuapi";
     const url = `${request.client_url}/${prefix}/${command}`;
 
     try {
         const response = await fetch(url, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(getParameters(command, request.card_type))
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(getParameters(command, request.card_type)),
         });
 
         const data = await response.json();
 
-        // Special handling for MYNUMBER → setPin
+        // Special handling for MYNUMBER → run SET_PIN
         if (request.card_type === "MYNUMBER" && command === "IIA_IVD_RECOG") {
             const pin = data?.output?.Pin14OfMNC || null;
             const pinStatus = await executeSetPin(pin, request);
 
             if (!pinStatus?.result || pinStatus.result !== "OK") {
-                const error = new Error(pinStatus.text || "SET_PIN failed");
-                error.step = "SET_PIN";
-                throw error;
+                throwErrorWithCommand(pinStatus.text, "SET_PIN");
             }
 
             return pinStatus;
@@ -1158,10 +1160,14 @@ async function ivuApi(request) {
 
         return data;
     } catch (error) {
-        console.error(`Error executing ${command}:`, error);
-        throw new Error(error?.message || error?.text || `Failed step: ${command}`);
+        console.error(`Error in ${command}:`, error);
+        if (outerStep === "GET_RECORD") {
+            throwErrorWithCommand(error.message, "GET_RECORD");
+        }
+        return {}; // Silent fail
     }
 }
+
 
   
   
@@ -1176,33 +1182,32 @@ async function ivuApi(request) {
    */
   async function processStepResponse(command, request) {
     const url = `${request.client_url}/ivuapi/${command}`;
-  
+
     try {
         const response = await fetch(url, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(getParameters(command, request.card_type))
         });
-  
+
         const data = await response.json();
         console.info(`${command} response:`, data);
-        if (!data?.result || (data.result !== "OK"))
-        {
-            throw new Error(data.text);
+
+        if (!data?.result || data.result !== "OK") {
+            throwErrorWithCommand(data.text, command);
         }
-  
+
         if (command === "GET_RECORD") {
             return await extractDataFromRecordResponse(data);
         }
-  
+
         return {};
     } catch (error) {
-        console.error(`Error executing ${command}:`, error);
-        throw new Error(error.text);
+        console.error(`Error in ${command}:`, error);
+        throwErrorWithCommand(error.message, command);
     }
-  }
+}
+
   
   /**
    * Execute the SET_PIN command to set the PIN for the current MYNUMBER card.
@@ -1219,21 +1224,19 @@ async function ivuApi(request) {
     try {
         const response = await fetch(url, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ pin_type: "MYNUMBER_PINB_14", data: pin })
         });
 
         const data = await response.json();
         console.info("SET_PIN response:", data);
-
         return data;
     } catch (error) {
-        console.error("Error executing SET_PIN:", error);
-        throw new Error(error.text);
+        console.error("SET_PIN error:", error);
+        throwErrorWithCommand("SET_PIN request failed", "SET_PIN");
     }
 }
+
 
   
   
