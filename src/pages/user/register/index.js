@@ -890,11 +890,11 @@ const handleScan = async () => {
     });
   };
 
-  const ivuResult = async () => {
+  const ivuResult = async (cardType) => {
    // if(window.location.origin === "https://rakuraku.nichi.in"){
       try{
         setLoader(true);
-      const res = await fetchIvuResponse();
+      const res = await fetchIvuResponse(cardType);
       if (res) {
         const evacueeArray = res;
         let newEvacuee = createEvacuee(evacueeArray);
