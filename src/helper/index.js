@@ -1041,6 +1041,7 @@ function calculateDOBAge(birthdate) {
 async function tryReadCard(request, cardType, command) {
     request.card_type = cardType;
     await executeStep("CLEAR_RESULT", request);
+    await new Promise(res => setTimeout(res, 100));
     await executeStep("INITIALIZE_STATUS", request);
     return await executeStep(command, request);
 }
