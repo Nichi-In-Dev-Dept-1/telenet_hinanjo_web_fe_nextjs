@@ -1083,7 +1083,7 @@ async function tryReadCard(request, cardType, command) {
         }
 
         if (!initialStatus?.result || initialStatus.result !== "OK") {
-        initialStatus = await tryReadCard(request, "MYNUMBER", "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE");
+        initialStatus = await tryReadCard(request, request.card_type, "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE");
        if (!initialStatus?.result || initialStatus.result !== "OK") {
         throw new Error(initialStatus.text || "Card reading failed.");
     }
