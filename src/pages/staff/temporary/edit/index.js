@@ -1068,7 +1068,7 @@ async function fetchIvuData() {
       ></QrConfirmDialog>
       <IvuConfirmDialog 
              visible={ivuVisible}
-             setVisible={setIvuVisible}
+             setIvuVisible={setIvuVisible}
              onCardSelected={(type) => {
                 checkCardType();
               // 👉 Do whatever you want here — call API, update state, etc.
