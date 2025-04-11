@@ -1134,7 +1134,9 @@ function calculateDOBAge(birthdate) {
         } else {
             const status = await executeStep(step, request);
             if (!status?.result || (status.result !== "OK" && !(step === "IVU_CMD_IDCARD_OUTPUT" && request.card_type === "DRVLIC" && status.result === "NG"))) {
+                if (step === "GET_RECORD") {
                 throw new Error(status.text);
+                }
             }
         }
     }
@@ -1210,6 +1212,10 @@ function calculateDOBAge(birthdate) {
   
         const data = await response.json();
         console.info(`${command} response:`, data);
+        if (!data?.result || (data.result !== "OK"))
+        {
+            throw new Error(data.text);
+        }
   
         if (command === "GET_RECORD") {
             return await extractDataFromRecordResponse(data);
