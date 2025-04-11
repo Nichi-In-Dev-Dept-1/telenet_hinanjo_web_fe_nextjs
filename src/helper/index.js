@@ -1172,7 +1172,9 @@ function calculateDOBAge(birthdate) {
             const pin = data?.output?.Pin14OfMNC || null;
             const status = await executeSetPin(pin, request);
             if (!status?.result || status.result !== "OK") {
+                if (command === "GET_RECORD") {
                 throw new Error(status.text);
+                }
             }
             return status;
         }
