@@ -1077,7 +1077,7 @@ async function tryReadCard(request, cardType, command) {
 
     // Define retry attempts in order
     const attempts = [
-        { type: "MYNUMBER", command: "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE" },
+        { type: "MYNUMBER", command: "IVU_CMD_IDCARD_READ_FRONTSIDE" },
         { type: "DRVLIC", command: "IVU_CMD_IDCARD_READ_FRONTSIDE" },
         { type: "DRVLIC", command: "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE" },
     ];
