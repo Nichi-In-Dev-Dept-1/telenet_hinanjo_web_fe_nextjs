@@ -1105,5 +1105,8 @@
       "guide_message": "スキャンした内容が画面に反映されていることを確認し、修正が必要な場合は修正してください。問題がなければ、以下の項目を選択または入力し、確認画面へ進んでください。",
       "plusTek_scan_msg":"カードを以下のサンプル画像のように配置し、「スキャン」ボタンを押してください。",
       "scan":"スキャナ",
-      "skip_this_step_message": "このステップをスキップしますか？"
+      "skip_this_step_message": "このステップをスキップしますか？",
+       "my_number_button":"マイナンバーカード",
+      "driver_license_button":"免許証",
+      "select_card_Option" :"使用するカードをお選びください"
 }

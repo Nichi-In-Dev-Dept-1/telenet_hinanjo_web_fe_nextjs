@@ -50,6 +50,7 @@ import QrConfirmDialog from "@/components/modal/QrConfirmDialog";
 import YaburuModal from "@/components/modal/yaburuModal";
 import toast from "react-hot-toast";
 import { PerspectiveImageCropping } from "@/components/perspectiveImageCropping";
+import IvuConfirmDialog from "@/components/modal/ivuConfirmDialog";
 export default function Admission() {
   const { locale, localeJson, setLoader ,webFxScaner, selectedScannerName } = useContext(LayoutContext);
   const personCount = localStorage.getItem("personCount");
@@ -98,6 +99,7 @@ export default function Admission() {
   const formikRef = useRef();
   const [QrScanPopupModalOpen, setQrScanPopupModalOpen] = useState(false);
   const [visible, setVisible] = useState(false);
+   const [ivuVisible,setIvuVisible] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
   const [modalMessageFlag, setModalMessageFlag] = useState(true);
   const [confirm, setConfirm] = useState(false);
@@ -988,6 +990,14 @@ const handleScan = async () => {
   // }
   };
 
+  const checkCardType = async() => {
+    let isMyNumber = localStorage.getItem("myNumber")=="true";
+    let isDrivingLicense = localStorage.getItem("driverLicense")=="true";
+    // checkDeviceConnection()
+    isMyNumber && ivuResult("MYNUMBER");
+    isDrivingLicense && ivuResult("DRVLIC");
+  }
+
   const handleRecordingStateChange = (isRecord) => {
     setMIsRecording(isRecord);
     setIsRecording(isRecord);
@@ -1284,6 +1294,14 @@ async function fetchIvuData() {
         callback={qrResult}
         setOpenQrPopup={setOpenQrPopup}
       ></QrScannerModal>
+      <IvuConfirmDialog 
+             visible={ivuVisible}
+             setVisible={setIvuVisible}
+             onCardSelected={(type) => {
+                checkCardType();
+              // 👉 Do whatever you want here — call API, update state, etc.
+            }}
+            ></IvuConfirmDialog>
       <QrConfirmDialog
         visible={visible}
         setVisible={setVisible}
@@ -1490,7 +1508,7 @@ async function fetchIvuData() {
                             text: translate(localeJson, "c_card_reg_ivu"),
                             icon: <img src={Card.url} width={30} height={30} />,
                             onClick: () => {
-                              isIvuDeviceConnected?ivuResult():
+                              isIvuDeviceConnected?setIvuVisible(true):
                               toast.error(locale=="en"?'Please check if the identity verification device is connected.':' 本人確認装置が接続されているかご確認ください。', {
                                 position: "top-right",
                               });

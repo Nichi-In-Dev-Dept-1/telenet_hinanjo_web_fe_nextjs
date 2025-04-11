@@ -45,6 +45,7 @@ import YaburuModal from "./yaburuModal";
 import QrConfirmDialog from "./QrConfirmDialog";
 import toast from "react-hot-toast";
 import { PerspectiveImageCropping } from "../perspectiveImageCropping";
+import IvuConfirmDialog from "./ivuConfirmDialog";
 export default function EvacueeTempRegModal(props) {
   const { localeJson, locale, setLoader,webFxScaner,selectedScannerName } = useContext(LayoutContext);
   const layoutReducer = useAppSelector((state) => state.layoutReducer);
@@ -448,6 +449,7 @@ async function fetchIvuData() {
   const [openQrPopup, setOpenQrPopup] = useState(false);
   const [QrScanPopupModalOpen, setQrScanPopupModalOpen] = useState(false);
   const [visible,setVisible] = useState(false);
+  const [ivuVisible,setIvuVisible] = useState(false);
 
   const closeQrPopup = () => {
     setOpenQrPopup(false);
@@ -497,10 +499,10 @@ async function fetchIvuData() {
     });
   };
 
-  const ivuResult = async() => {
+  const ivuResult = async(cardType) => {
       try{
       setLoader(true);
-      const evacueeArray = await fetchIvuResponse();
+      const evacueeArray = await fetchIvuResponse(cardType);
       formikRef.current.resetForm();
       createEvacuee(evacueeArray, formikRef.current.setFieldValue);
       setLoader(false);
@@ -524,6 +526,14 @@ async function fetchIvuData() {
     //     setLoader(false);
     //   }
     // });
+  }
+
+  const checkCardType = async() => {
+    let isMyNumber = localStorage.getItem("myNumber")=="true";
+    let isDrivingLicense = localStorage.getItem("driverLicense")=="true";
+    // checkDeviceConnection()
+    isMyNumber && ivuResult("MYNUMBER");
+    isDrivingLicense && ivuResult("DRVLIC");
   }
 
   async function createEvacuee(evacuees, setFieldValue) {
@@ -886,6 +896,14 @@ async function fetchIvuData() {
        setOpenQrPopup={setOpenQrPopup}
        setQrScanPopupModalOpen={setQrScanPopupModalOpen}
       ></QrConfirmDialog>
+      <IvuConfirmDialog 
+       visible={ivuVisible}
+       setVisible={setIvuVisible}
+       onCardSelected={(type) => {
+          checkCardType();
+        // 👉 Do whatever you want here — call API, update state, etc.
+      }}
+      ></IvuConfirmDialog>
        <YaburuModal
           open={QrScanPopupModalOpen}
           close={closeQrScanPopup}
@@ -1178,7 +1196,7 @@ async function fetchIvuData() {
                             text: translate(localeJson, "c_card_reg_ivu"),
                             icon: <img src={Card.url} width={30} height={30} />,
                             onClick: () => {
-                              isIvuDeviceConnected?ivuResult():
+                              isIvuDeviceConnected?setIvuVisible(true):
                               toast.error(locale=="en"?'Please check if the identity verification device is connected.':' 本人確認装置が接続されているかご確認ください。', {
                                 position: "top-right",
                               });

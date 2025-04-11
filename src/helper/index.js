@@ -1017,11 +1017,11 @@ function calculateDOBAge(birthdate) {
     return { years, months };
   }
 
-  export async function fetchIvuResponse() {
+  export async function fetchIvuResponse(cardType) {
     try {
         const request = {
             client_url: "http://127.0.0.1:50080", // Replace with actual API endpoint
-            card_type: "MYNUMBER", // Initial card type
+            card_type: cardType, // Initial card type
         };
 
         const response = await ivuApi(request);
@@ -1038,13 +1038,13 @@ function calculateDOBAge(birthdate) {
     }
 }
 
-async function tryReadCard(request, cardType, command) {
-    request.card_type = cardType;
-    await executeStep("CLEAR_RESULT", request);
-    await new Promise(res => setTimeout(res, 100));
-    await executeStep("INITIALIZE_STATUS", request);
-    return await executeStep(command, request);
-}
+// async function tryReadCard(request, cardType, command) {
+//     request.card_type = cardType;
+//     await executeStep("CLEAR_RESULT", request);
+//     await new Promise(res => setTimeout(res, 100));
+//     await executeStep("INITIALIZE_STATUS", request);
+//     return await executeStep(command, request);
+// }
 
   
 /**
@@ -1073,35 +1073,38 @@ async function tryReadCard(request, cardType, command) {
  * @throws {Error} If the API returns an error response.
  */
    async function ivuApi(request) {
-    request.card_type = "MYNUMBER";
+    // request.card_type = "MYNUMBER";
 
-    // Define retry attempts in order
-    const attempts = [
-        { type: "MYNUMBER", command: "IVU_CMD_IDCARD_READ_FRONTSIDE" },
-        { type: "DRVLIC", command: "IVU_CMD_IDCARD_READ_FRONTSIDE" },
-        { type: "DRVLIC", command: "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE" },
-    ];
+    // // Define retry attempts in order
+    // const attempts = [
+    //     { type: "MYNUMBER", command: "IVU_CMD_IDCARD_READ_FRONTSIDE" },
+    //     { type: "DRVLIC", command: "IVU_CMD_IDCARD_READ_FRONTSIDE" },
+    //     { type: "DRVLIC", command: "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE" },
+    // ];
     
     
-    let initialStatus = null;
+    // let initialStatus = null;
     
-    // Try all defined attempts
-    for (const attempt of attempts) {
-        initialStatus = await tryReadCard(request, attempt.type, attempt.command);
-        if (initialStatus?.result === "OK") {
-            break;
-        }
-    }
+    // // Try all defined attempts
+    // for (const attempt of attempts) {
+    //     initialStatus = await tryReadCard(request, attempt.type, attempt.command);
+    //     if (initialStatus?.result === "OK") {
+    //         break;
+    //     }
+    // }
     
-    // Throw error if none succeeded
-    if (!initialStatus?.result || initialStatus.result !== "OK") {
-        throw new Error(initialStatus.text || "Card reading failed.");
-    }
+    // // Throw error if none succeeded
+    // if (!initialStatus?.result || initialStatus.result !== "OK") {
+    //     throw new Error(initialStatus.text || "Card reading failed.");
+    // }
     
-    console.info(`IVU_CMD_IDCARD_READ_FRONTSIDE status: ${initialStatus.result === "OK" ? "OK" : "FAILED"}`);
+    // console.info(`IVU_CMD_IDCARD_READ_FRONTSIDE status: ${initialStatus.result === "OK" ? "OK" : "FAILED"}`);
     
     // Step definitions
     const primarySteps = [
+        "CLEAR_RESULT",
+        "INITIALIZE_STATUS",
+        "IVU_CMD_IDCARD_READ_FRONTSIDE",
         "IIA_IVD_RECOG",
         "IVU_CMD_IDCARD_VERIFY",
         // "IVU_CMD_IDCARD_READ_FRONTSIDE", // optionally omitted
@@ -1121,7 +1124,7 @@ async function tryReadCard(request, cardType, command) {
     ];
     
     // Decide steps based on success
-    const steps = initialStatus.result === "OK" ? primarySteps : fallbackSteps;
+    const steps = primarySteps;
     
     let data = {};
     
