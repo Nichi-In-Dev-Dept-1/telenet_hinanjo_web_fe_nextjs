@@ -1231,6 +1231,9 @@ async function ivuApi(request) {
         });
 
         const data = await response.json();
+        if (!data?.result || data.result !== "OK") {
+            throwErrorWithCommand(data.text, "SET_PIN");
+        }
         console.info("SET_PIN response:", data);
         return data;
     } catch (error) {
