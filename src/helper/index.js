@@ -1103,6 +1103,7 @@ async function ivuApi(request) {
                 data = await processStepResponse(step, request);
             } else {
                 const status = await executeStep(step, request, step);
+
                 if (!status?.result || status.result !== "OK") {
                     if (step === "GET_RECORD") {
                         throwErrorWithCommand(status.text, "GET_RECORD");
@@ -1232,7 +1233,8 @@ async function ivuApi(request) {
 
         const data = await response.json();
         if (!data?.result || data.result !== "OK") {
-            throwErrorWithCommand(data.text, "SET_PIN");
+            toast.error(data?.text || "SET_PIN failed", { position: "top-right" });
+            return null; // ❌ Stop here, don’t continue other steps
         }
         console.info("SET_PIN response:", data);
         return data;
