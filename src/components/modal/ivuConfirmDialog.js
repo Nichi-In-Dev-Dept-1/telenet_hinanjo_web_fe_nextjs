@@ -32,7 +32,7 @@ const IvuConfirmDialog = (props) => {
       </div>
 
       <div className="col mt-4">
-        <div className="p-2 flex justify-content-center">
+        <div className="p-2 flex justify-content-center flex-wrap">
           <Button
             buttonProps={{
               type: "button",
