@@ -1104,6 +1104,11 @@ async function ivuApi(request) {
             } else {
                 const status = await executeStep(step, request, step);
 
+                if (status === null) {
+                    // SET_PIN failed, stop processing
+                    return null;
+                }
+
                 if (!status?.result || status.result !== "OK") {
                     if (step === "GET_RECORD") {
                         throwErrorWithCommand(status.text, "GET_RECORD");
@@ -1157,6 +1162,10 @@ async function ivuApi(request) {
             // if (!pinStatus?.result || pinStatus.result !== "OK") {
             //     throwErrorWithCommand(pinStatus.text, "SET_PIN");
             // }
+
+            if (!pinStatus) {
+                return null; // SET_PIN failed, stop here
+            }
 
             return pinStatus;
         }
