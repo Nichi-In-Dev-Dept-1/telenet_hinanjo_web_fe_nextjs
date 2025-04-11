@@ -1224,7 +1224,7 @@ function calculateDOBAge(birthdate) {
         return {};
     } catch (error) {
         console.error(`Error executing ${command}:`, error);
-        throw new Error(`Failed to execute ${command}`);
+        throw new Error(error.text);
     }
   }
   
