@@ -1153,9 +1153,9 @@ async function ivuApi(request) {
             const pin = data?.output?.Pin14OfMNC || null;
             const pinStatus = await executeSetPin(pin, request);
 
-            if (!pinStatus?.result || pinStatus.result !== "OK") {
-                throwErrorWithCommand(pinStatus.text, "SET_PIN");
-            }
+            // if (!pinStatus?.result || pinStatus.result !== "OK") {
+            //     throwErrorWithCommand(pinStatus.text, "SET_PIN");
+            // }
 
             return pinStatus;
         }
