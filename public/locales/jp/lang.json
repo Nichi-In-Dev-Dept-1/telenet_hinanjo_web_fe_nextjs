@@ -1108,5 +1108,5 @@
       "skip_this_step_message": "このステップをスキップしますか？",
        "my_number_button":"マイナンバーカード",
       "driver_license_button":"免許証",
-      "select_card_Option" :"使用するカードをお選びください"
+      "select_card_Option" :"使用するカードを選択してください。"
 }

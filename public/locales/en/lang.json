@@ -1112,5 +1112,5 @@
     "skip_this_step_message": "Do you want to skip this step?",
     "my_number_button":"MyNumberCard",
     "driver_license_button":"Driver's license",
-    "select_card_Option" :"Please choose the card to use."
+    "select_card_Option" :"Please select the card."
 }
