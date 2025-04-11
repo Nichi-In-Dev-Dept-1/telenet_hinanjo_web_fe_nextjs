@@ -1072,48 +1072,9 @@ function calculateDOBAge(birthdate) {
  *   - refugee_name: The name of the refugee card holder.
  * @throws {Error} If the API returns an error response.
  */
-   async function ivuApi(request) {
-    // request.card_type = "MYNUMBER";
-
-    // // Define retry attempts in order
-    // const attempts = [
-    //     { type: "MYNUMBER", command: "IVU_CMD_IDCARD_READ_FRONTSIDE" },
-    //     { type: "DRVLIC", command: "IVU_CMD_IDCARD_READ_FRONTSIDE" },
-    //     { type: "DRVLIC", command: "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE" },
-    // ];
-    
-    
-    // let initialStatus = null;
-    
-    // // Try all defined attempts
-    // for (const attempt of attempts) {
-    //     initialStatus = await tryReadCard(request, attempt.type, attempt.command);
-    //     if (initialStatus?.result === "OK") {
-    //         break;
-    //     }
-    // }
-    
-    // // Throw error if none succeeded
-    // if (!initialStatus?.result || initialStatus.result !== "OK") {
-    //     throw new Error(initialStatus.text || "Card reading failed.");
-    // }
-    
-    // console.info(`IVU_CMD_IDCARD_READ_FRONTSIDE status: ${initialStatus.result === "OK" ? "OK" : "FAILED"}`);
-    
-    // Step definitions
+async function ivuApi(request) {
     const primarySteps = [
         "CLEAR_RESULT",
-        "INITIALIZE_STATUS",
-        "IIA_IVD_RECOG",
-        "IVU_CMD_IDCARD_VERIFY",
-        "IVU_CMD_IDCARD_READ_FRONTSIDE",
-        // "IVU_CMD_IDCARD_READ_FRONTSIDE", // optionally omitted
-        "IVU_CMD_IDCARD_OUTPUT",
-        "GET_RECORD",
-        "CLEAR_RESULT"
-    ];
-    
-    const fallbackSteps = [
         "INITIALIZE_STATUS",
         "IVU_CMD_IDCARD_READ_FRONTSIDE",
         "IIA_IVD_RECOG",
@@ -1124,32 +1085,38 @@ function calculateDOBAge(birthdate) {
     ];
 
     if (request.card_type === "DRVLIC") {
-        // Add the extra step only for 'driv' card_type
-        primarySteps.splice(3, 0, "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE"); 
-        // This adds it at index 3, right before "IIA_IVD_RECOG"
+        primarySteps.splice(3, 0, "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE");
     }
-    
-    // Decide steps based on success
-    const steps = primarySteps;
-    
+
     let data = {};
-    
-    for (const step of steps) {
-        if (step === "GET_RECORD") {
-            data = await processStepResponse(step, request);
-        } else {
-            const status = await executeStep(step, request);
-            if (!status?.result || (status.result !== "OK" && !(step === "IVU_CMD_IDCARD_OUTPUT" && request.card_type === "DRVLIC" && status.result === "NG"))) {
-                if (step === "GET_RECORD") {
-                throw new Error(status.text);
+
+    for (const step of primarySteps) {
+        try {
+            if (step === "GET_RECORD") {
+                data = await processStepResponse(step, request);
+            } else {
+                const status = await executeStep(step, request);
+
+                if (
+                    !status?.result ||
+                    (status.result !== "OK" &&
+                        !(step === "IVU_CMD_IDCARD_OUTPUT" &&
+                          request.card_type === "DRVLIC" &&
+                          status.result === "NG"))
+                ) {
+                    throw new Error(status?.text || `${step} failed`);
                 }
             }
+        } catch (error) {
+            const failedStep = error?.step || step;
+            console.error(`Step "${failedStep}" failed:`, error);
+            throw new Error(`Step "${failedStep}" failed: ${error.message}`);
         }
     }
-    
+
     return data;
-  }
-  
+}
+
 
   /**
    * Execute a step in the card recognition flow.
@@ -1163,7 +1130,7 @@ function calculateDOBAge(birthdate) {
   async function executeStep(command, request) {
     let prefix = command === "IIA_IVD_RECOG" ? "gmapi" : "ivuapi";
     const url = `${request.client_url}/${prefix}/${command}`;
-  
+
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -1172,27 +1139,30 @@ function calculateDOBAge(birthdate) {
             },
             body: JSON.stringify(getParameters(command, request.card_type))
         });
-  
+
         const data = await response.json();
-  
-        // Handle special case for "IIA_IVD_RECOG"
+
+        // Special handling for MYNUMBER → setPin
         if (request.card_type === "MYNUMBER" && command === "IIA_IVD_RECOG") {
             const pin = data?.output?.Pin14OfMNC || null;
-            const status = await executeSetPin(pin, request);
-            if (!status?.result || status.result !== "OK") {
-                if (command === "GET_RECORD" || command === "SET_PIN") {
-                throw new Error(status.text);
-                }
+            const pinStatus = await executeSetPin(pin, request);
+
+            if (!pinStatus?.result || pinStatus.result !== "OK") {
+                const error = new Error(pinStatus.text || "SET_PIN failed");
+                error.step = "SET_PIN";
+                throw error;
             }
-            return status;
+
+            return pinStatus;
         }
-  
+
         return data;
     } catch (error) {
         console.error(`Error executing ${command}:`, error);
-        throw new Error(`Failed to execute ${command}`);
+        throw new Error(error?.message || error?.text || `Failed step: ${command}`);
     }
-  }
+}
+
   
   
   /**
@@ -1245,7 +1215,7 @@ function calculateDOBAge(birthdate) {
    */
   async function executeSetPin(pin, request) {
     const url = `${request.client_url}/ivuapi/SET_PIN`;
-  
+
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -1254,16 +1224,17 @@ function calculateDOBAge(birthdate) {
             },
             body: JSON.stringify({ pin_type: "MYNUMBER_PINB_14", data: pin })
         });
-  
+
         const data = await response.json();
         console.info("SET_PIN response:", data);
-  
+
         return data;
     } catch (error) {
         console.error("Error executing SET_PIN:", error);
-        throw new Error("Failed to execute SET_PIN");
+        throw new Error("SET_PIN API call failed");
     }
-  }
+}
+
   
   
   /**
