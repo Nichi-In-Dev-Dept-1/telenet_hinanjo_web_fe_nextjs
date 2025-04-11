@@ -1073,28 +1073,37 @@ async function tryReadCard(request, cardType, command) {
  */
    async function ivuApi(request) {
     request.card_type = "MYNUMBER";
-    // await executeStep("CLEAR_RESULT", request);
-    // await executeStep("INITIALIZE_STATUS", request);
+
+    // Define retry attempts in order
+    const attempts = [
+        { type: "MYNUMBER", command: "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE" },
+        { type: "DRVLIC", command: "IVU_CMD_IDCARD_READ_FRONTSIDE" },
+        { type: "DRVLIC", command: "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE" },
+    ];
     
-    let initialStatus = await tryReadCard(request, "MYNUMBER", "IVU_CMD_IDCARD_READ_FRONTSIDE");
-
-        if (!initialStatus?.result || initialStatus.result !== "OK") {
-             initialStatus = await tryReadCard(request, "DRVLIC", "IVU_CMD_IDCARD_READ_FRONTSIDE");
+    
+    let initialStatus = null;
+    
+    // Try all defined attempts
+    for (const attempt of attempts) {
+        initialStatus = await tryReadCard(request, attempt.type, attempt.command);
+        if (initialStatus?.result === "OK") {
+            break;
         }
-
-        if (!initialStatus?.result || initialStatus.result !== "OK") {
-        initialStatus = await tryReadCard(request, request.card_type, "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE");
-       if (!initialStatus?.result || initialStatus.result !== "OK") {
+    }
+    
+    // Throw error if none succeeded
+    if (!initialStatus?.result || initialStatus.result !== "OK") {
         throw new Error(initialStatus.text || "Card reading failed.");
     }
-}
     
     console.info(`IVU_CMD_IDCARD_READ_FRONTSIDE status: ${initialStatus.result === "OK" ? "OK" : "FAILED"}`);
     
+    // Step definitions
     const primarySteps = [
         "IIA_IVD_RECOG",
         "IVU_CMD_IDCARD_VERIFY",
-        //"IVU_CMD_IDCARD_READ_FRONTSIDE",
+        // "IVU_CMD_IDCARD_READ_FRONTSIDE", // optionally omitted
         "IVU_CMD_IDCARD_OUTPUT",
         "GET_RECORD",
         "CLEAR_RESULT"
@@ -1110,7 +1119,9 @@ async function tryReadCard(request, cardType, command) {
         "CLEAR_RESULT"
     ];
     
+    // Decide steps based on success
     const steps = initialStatus.result === "OK" ? primarySteps : fallbackSteps;
+    
     let data = {};
     
     for (const step of steps) {
