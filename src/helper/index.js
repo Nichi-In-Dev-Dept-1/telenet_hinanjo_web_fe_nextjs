@@ -1110,7 +1110,7 @@ async function ivuApi(request) {
                 }
 
                 if (!status?.result || status.result !== "OK") {
-                    if (step === "GET_RECORD" && step === "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE") {
+                    if (step === "GET_RECORD" || step === "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE") {
                         throwErrorWithCommand(status.text, "GET_RECORD");
                     }
                 }
