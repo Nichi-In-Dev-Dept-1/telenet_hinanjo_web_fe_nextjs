@@ -1094,6 +1094,9 @@ async function ivuApi(request) {
     if (request.card_type === "DRVLIC") {
         steps.splice(2, 0, "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE");
     }
+    if (request.card_type === "MYNUMBER") {
+        steps[2] ="IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE";
+    }
 
     let data = {};
 
