@@ -1092,7 +1092,7 @@ async function ivuApi(request) {
     ];
 
     if (request.card_type === "DRVLIC") {
-        steps.splice(3, 0, "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE");
+        steps.splice(2, 0, "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE");
     }
 
     let data = {};
