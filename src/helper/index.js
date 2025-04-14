@@ -1111,6 +1111,7 @@ async function ivuApi(request) {
 
                 if (!status?.result || status.result !== "OK") {
                     if (step === "GET_RECORD" || step === "IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE") {
+                        await executeStep("CLEAR_RESULT", request);
                         throwErrorWithCommand(status.text, "GET_RECORD");
                     }
                 }
