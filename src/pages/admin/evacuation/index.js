@@ -244,7 +244,7 @@ export default function EvacuationPage() {
                 place_id: selectedOption && selectedOption.id != 0 ? selectedOption.id : "",
                 family_code: convertToSingleByte(familyCode),
                 refugee_name: refugeeName,
-                checkout_flg: "",
+                checkout_flg: getListPayload.filters.checkout_flg,
             }
         }
         getList(payload, onGetEvacueesList);
