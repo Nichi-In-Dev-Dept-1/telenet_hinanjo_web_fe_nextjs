@@ -54,7 +54,7 @@ export default function HQEvacuationPage() {
             place_id: "",
             family_code: "",
             refugee_name: "",
-            checkout_flg: 0
+            checkout_flg: ""
         },
     });
 
@@ -82,6 +82,7 @@ export default function HQEvacuationPage() {
                 );
             },
         },
+         { field: 'family_is_registered', header: translate(localeJson, 'status'), sortable: true, alignHeader: "left",minWidth: '3rem', maxWidth: '3rem'},
         {
             field: "place_name",
             header: translate(localeJson, "place_name"),
@@ -289,6 +290,7 @@ export default function HQEvacuationPage() {
                     out_date: item.family_out_date
                         ? getGeneralDateTimeSlashDisplayFormat(item.family_out_date)
                         : "",
+                     "family_is_registered": item.family_is_registered == 1 ? translate(localeJson, 'check_in') : translate(localeJson, 'exit'),
                     yapple_id: item.yapple_id,
                 };
                 let personAnswers = item.person_answers ? item.person_answers : [];
@@ -378,7 +380,7 @@ export default function HQEvacuationPage() {
                     selectedOption && selectedOption.id != 0 ? selectedOption.id : "",
                 family_code: convertToSingleByte(familyCode),
                 refugee_name: refugeeName,
-                checkout_flg: getListPayload.filters.checkout_flg,
+                checkout_flg: "",
             },
         };
         getList(payload, onGetEvacueesList);
