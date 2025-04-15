@@ -190,7 +190,7 @@ export const PerspectiveCropping = (props) => {
                         </>
                     ) : (
                         <>
-                            {!completed ? (
+                            {(!completed && !baseConvertion) ? (
                                 <div>
                                     <Button
                                         parentStyle={{ display: "inline" }}
@@ -244,11 +244,15 @@ export const PerspectiveCropping = (props) => {
                                         },
                                         buttonClass: "mt-2",
                                         onClick: () => {
+                                            if(result) 
+                                            {
                                             setSelectUtil('camera');
                                             setCompleted(true)
                                             setImg(undefined);
                                             setCropState();
+                                            setBaseConvertion(false);
                                             props.callback(result);
+                                            }
                                         },
                                     }}
                                 />
@@ -262,7 +266,8 @@ export const PerspectiveCropping = (props) => {
 
     const onDragStop = useCallback((s) => setCropState(s), [])
     const onChange = useCallback((s) => setCropState(s), [])
-    const [result, setResult] = useState("")
+    const [result, setResult] = useState("");
+    const [baseConvertion,setBaseConvertion] = useState(false);
 
     const doSomething = async () => {
         try {
@@ -303,6 +308,7 @@ export const PerspectiveCropping = (props) => {
 
                         // Set the result with the PNG data URL
                         setResult(pngDataUrl);
+                        setBaseConvertion(true);
                     };
 
                     // Set the image source to the base64 data
@@ -324,9 +330,9 @@ export const PerspectiveCropping = (props) => {
         if (e.file) {
             // It can also be a http or base64 string for example
             setTimeout(() => {
-                setLoader(false);
                 setImg(e.file.originFileObj);
                 setCompleted(false);
+                setLoader(false);
             }, 2000);
         }
     }
@@ -352,6 +358,7 @@ export const PerspectiveCropping = (props) => {
                     setImg(undefined);
                     setCropState();
                     setResult("");
+                    setBaseConvertion(false);
                     setRotateAngel(0);
                 }}
                 footer={renderFooter('displayPosition')}
