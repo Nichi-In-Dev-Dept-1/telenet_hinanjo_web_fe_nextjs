@@ -396,12 +396,14 @@ export default function EvacuationPage() {
                                             parentClass={"custom-switch"} />
                                     </div> */}
                                     <div>
-                                    <Tooltip
-                                                                    target=".custom-target-icon"
-                                                                    position="bottom"
-                                                                    content={translate(localeJson, "status_tooltip")}
-                                                                    className="shadow-none"
-                                                                  />
+                                        {selectedStatusOption !== "0" && evacueesDataList.length <= 0 && (
+                                            <Tooltip
+                                                target=".custom-target-icon"
+                                                position="top"
+                                                content={translate(localeJson, "status_tooltip")}
+                                                className="shadow-none"
+                                            />
+                                        )}
                                         <Button buttonProps={{
                                             type: "button",
                                             rounded: "true",
@@ -411,7 +413,7 @@ export default function EvacuationPage() {
                                             severity: "primary",
                                             disabled: selectedStatusOption != "1"||evacueesDataList.length <= 0,
                                             onClick: () => openDeleteDialog()
-                                        }} parentClass={`${selectedStatusOption != "1" ?"custom-target-icon" :""} export-button`} />
+                                        }} parentClass={`custom-target-icon export-button`} />
 
                                                                 
                                     </div>
