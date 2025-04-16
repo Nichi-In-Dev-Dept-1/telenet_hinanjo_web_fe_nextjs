@@ -65,7 +65,7 @@ export default function EvacuationPage() {
                 </div>
             },
         },
-        { field: 'family_is_registered', header: translate(localeJson, 'status_furigana'), sortable: true, alignHeader: "left",minWidth: '3rem', maxWidth: '3rem'},
+        { field: 'family_is_registered', header: translate(localeJson, 'status_furigana'), sortable: true, alignHeader: "left",minWidth: '3rem', maxWidth: '4rem'},
         { field: 'place_name', header: translate(localeJson, 'place_name'), sortable: false, textAlign: "center", alignHeader: "center", minWidth: '3rem', maxWidth: '3rem' },
         { field: 'family_code', header: translate(localeJson, 'family_code'), sortable: true, textAlign: "center", alignHeader: "center", minWidth: '3rem', maxWidth: '4rem' },
         { field: 'family_count', header: translate(localeJson, 'family_count'), sortable: false, textAlign: "center", alignHeader: "center", minWidth: '3rem', maxWidth: '3rem' },
