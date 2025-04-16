@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import { AiOutlineDrag } from "react-icons/ai";
 
 import { LayoutContext } from "@/layout/context/layoutcontext";
-import { convertToSingleByte, getValueByKeyRecursively as translate } from "@/helper";
+import { convertToSingleByte, hideOverFlow, showOverFlow, getValueByKeyRecursively as translate } from "@/helper";
 import {
   Button,
   CustomHeader,
@@ -16,12 +16,13 @@ import {
   ValidationError,
   Input,
   InputDropdown,
-  InputNumber
+  InputNumber,
 } from "@/components";
 import { mapScaleRateOptions } from "@/utils/constant";
 import { systemSettingServices } from "@/services";
 import { setLayout } from "@/redux/layout";
 import { useAppDispatch } from "@/redux/hooks";
+import DbResetModal from "@/components/modal/dbResetModal";
 
 export default function Setting() {
   const { localeJson, locale, setLoader } = useContext(LayoutContext);
@@ -29,6 +30,7 @@ export default function Setting() {
 
   const [response, setResponse] = useState({});
   const [data, setData] = useState([]);
+    const [deleteOpen, setDeleteOpen] = useState(false);
   const [initialValues, setInitialValues] = useState({
     map_scale: "",
     footer: "",
@@ -49,7 +51,7 @@ export default function Setting() {
   }
   );
 
-  const { getList, update } = systemSettingServices;
+  const { getList, update, bulkDelete } = systemSettingServices;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -302,8 +304,38 @@ export default function Setting() {
     setLoader(false);
   };
 
+      const onConfirmDeleteRegisteredEvacuees = async () => {
+          bulkDelete((res) => {
+              if (res) {
+                  setLoader(false);
+              }
+              else {
+                  setLoader(false);
+              }
+  
+          });
+      }
+    
+    const openDeleteDialog = () => {
+          setDeleteOpen(true);
+          hideOverFlow();
+      }
+  
+      const onDeleteClose = (status = '') => {
+          if (status == 'confirm') {
+              onConfirmDeleteRegisteredEvacuees();
+          }
+          setDeleteOpen(false);
+          showOverFlow();
+      };
+  
+
   return (
     <>
+     <DbResetModal
+                    open={deleteOpen}
+                    close={onDeleteClose}
+                />
       <Formik
         validationSchema={schema}
         initialValues={initialValues}
@@ -904,15 +936,24 @@ export default function Setting() {
                     </div>
                   </div>
                   <hr />
-                  <div className="text-center mt-2">
+                  <div className='flex flex-column mt-3 mb-2 justify-content-center align-items-center' style={{ justifyContent: "center", flexWrap: "wrap" }}>
                     <Button
                       buttonProps={{
-                        buttonClass: "w-8rem update-button",
+                        buttonClass: "w-10rem update-button",
                         type: "submit",
                         text: translate(localeJson, "save"),
                       }}
                       parentClass={"inline update-button"}
                     />
+                     <Button buttonProps={{
+                                                                type: "button",
+                                                                rounded: "true",
+                                                                delete: true,
+                                                                buttonClass: "w-10rem update-button",
+                                                                text: translate(localeJson, 'db_reset'),
+                                                                severity: "primary",
+                                                                onClick: () => openDeleteDialog()
+                                                            }} parentClass={"inline mt-3 update-button"} />
                   </div>
                 </form>
               </div>

@@ -5,6 +5,7 @@ import { toastDisplay } from "@/helper";
 export const systemSettingServices = {
   getList: _getSystemSettingList,
   update: _updateSystemSetting,
+  bulkDelete: _bulkDeleteSystemSetting,
 };
 
 function _getSystemSettingList(callBackFun) {
@@ -23,6 +24,21 @@ function _getSystemSettingList(callBackFun) {
 function _updateSystemSetting(payload, callBackFun) {
   axios
     .post(`/admin/systemSetting/upsert`, payload)
+    .then((response) => {
+      if (response && response.data) {
+        callBackFun(response.data);
+        toastDisplay(response);
+      }
+    })
+    .catch((error) => {
+      callBackFun(false);
+      toastDisplay(error?.response);
+    });
+}
+
+function _bulkDeleteSystemSetting(callBackFun) {
+  axios
+    .post(`/admin/reset-database`)
     .then((response) => {
       if (response && response.data) {
         callBackFun(response.data);
