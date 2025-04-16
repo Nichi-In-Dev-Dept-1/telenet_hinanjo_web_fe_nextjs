@@ -305,6 +305,7 @@ export default function Setting() {
   };
 
       const onConfirmDeleteRegisteredEvacuees = async () => {
+        setLoader(true);
           bulkDelete((res) => {
               if (res) {
                   setLoader(false);
