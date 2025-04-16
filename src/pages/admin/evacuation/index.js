@@ -396,10 +396,10 @@ export default function EvacuationPage() {
                                             parentClass={"custom-switch"} />
                                     </div> */}
                                     <div>
-                                        {selectedStatusOption !== "0" && evacueesDataList.length <= 0 && (
+                                        {selectedStatusOption != "1" && (
                                             <Tooltip
                                                 target=".custom-target-icon"
-                                                position="top"
+                                                position="bottom"
                                                 content={translate(localeJson, "status_tooltip")}
                                                 className="shadow-none"
                                             />
