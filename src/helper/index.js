@@ -1085,7 +1085,6 @@ async function ivuApi(request) {
         "INITIALIZE_STATUS",
         "IVU_CMD_IDCARD_READ_FRONTSIDE",
         "IIA_IVD_RECOG",
-        "IVU_CMD_IDCARD_VERIFY",
         "IVU_CMD_IDCARD_OUTPUT",
         "GET_RECORD",
         "CLEAR_RESULT"
@@ -1096,6 +1095,7 @@ async function ivuApi(request) {
     }
     if (request.card_type === "MYNUMBER") {
         steps[2] ="IVU_CMD_IDCARD_READ_FRONTSIDE_IMAGE";
+        steps.splice(4, 0, "IVU_CMD_IDCARD_VERIFY");
     }
 
     let data = {};
