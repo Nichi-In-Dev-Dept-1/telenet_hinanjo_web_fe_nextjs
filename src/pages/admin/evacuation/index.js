@@ -411,7 +411,7 @@ export default function EvacuationPage() {
                                             severity: "primary",
                                             disabled: selectedStatusOption != "1"||evacueesDataList.length <= 0,
                                             onClick: () => openDeleteDialog()
-                                        }} parentClass={"export-button custom-target-icon"} />
+                                        }} parentClass={`${selectedStatusOption != "1" ?"custom-target-icon" :""}export-button`} />
 
                                                                 
                                     </div>
