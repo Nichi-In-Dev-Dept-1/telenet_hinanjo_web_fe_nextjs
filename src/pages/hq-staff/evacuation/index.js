@@ -36,6 +36,7 @@ export default function HQEvacuationPage() {
         name: "--",
         id: 0,
     });
+    const [selectedStatusOption, setSelectedStatusOption] = useState("");
     const [evacueesDataList, setEvacueesDataList] = useState([]);
     const [evacuationPlaceList, setEvacuationPlaceList] = useState([]);
     const [tableLoading, setTableLoading] = useState(false);
@@ -185,6 +186,22 @@ export default function HQEvacuationPage() {
             return translate(localeJson, "others_count");
         }
     };
+
+    const getOptions = (locale) => {
+        if (locale === "ja") {
+          return [
+            { label: "すべて", value: "" }, // All
+            { label: "入所", value: 0 }, // Check-in
+            { label: "退所", value: 1 } // Check-out
+          ];
+        } else {
+          return [
+            { label: "All", value: "" },
+            { label: "Check-in", value: 0 },
+            { label: "Check-out", value: 1 }
+          ];
+        }
+      };
 
     const getPlaceName = (id) => {
         let data = evacuationPlaceList.find((obj) => obj.id == id);
@@ -456,6 +473,11 @@ export default function HQEvacuationPage() {
      */
     const showOnlyRegisteredEvacuees = async () => {
         setShowRegisteredEvacuees(!showRegisteredEvacuees);
+        setShowRegisteredEvacuees(!showRegisteredEvacuees);
+        setSelectedOption("");
+        setFamilyCode("");
+        setRefugeeName("");
+        setSelectedStatusOption(!showRegisteredEvacuees?1:"");
         setTableLoading(true);
         await setGetListPayload(prevState => ({
             ...prevState,
@@ -506,6 +528,21 @@ export default function HQEvacuationPage() {
                             <div>
                                 <form>
                                     <div className="modal-field-top-space modal-field-bottom-space flex flex-wrap float-right justify-content-end gap-3 lg:gap-2 md:gap-2 sm:gap-2 mobile-input">
+                                         <InputDropdown inputDropdownProps={{
+                                                                                    inputDropdownParentClassName: "w-full lg:w-14rem md:w-14rem sm:w-10rem",
+                                                                                    labelProps: {
+                                                                                        text: translate(localeJson, 'status_furigana'),
+                                                                                        inputDropdownLabelClassName: "block"
+                                                                                    },
+                                                                                    inputDropdownClassName: "w-full lg:w-14rem md:w-14rem sm:w-10rem",
+                                                                                    customPanelDropdownClassName: "w-10rem",
+                                                                                    value: selectedStatusOption,
+                                                                                    options: getOptions(locale),
+                                                                                    optionLabel: "label",
+                                                                                    onChange: (e) => setSelectedStatusOption(e.value),
+                                                                                    emptyMessage: translate(localeJson, "data_not_found"),
+                                                                                }}
+                                                                                />
                                         <InputDropdown
                                             inputDropdownProps={{
                                                 inputDropdownParentClassName:
