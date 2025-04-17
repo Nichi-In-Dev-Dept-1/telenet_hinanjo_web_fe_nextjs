@@ -397,7 +397,7 @@ export default function HQEvacuationPage() {
                     selectedOption && selectedOption.id != 0 ? selectedOption.id : "",
                 family_code: convertToSingleByte(familyCode),
                 refugee_name: refugeeName,
-                checkout_flg: getListPayload.filters.checkout_flg,
+                checkout_flg: selectedStatusOption,
             },
         };
         getList(payload, onGetEvacueesList);
@@ -483,7 +483,10 @@ export default function HQEvacuationPage() {
             ...prevState,
             filters: {
                 ...prevState.filters,
-                checkout_flg: showRegisteredEvacuees ? 0 : 1,
+                checkout_flg: showRegisteredEvacuees ? "" : 1,
+                place_id: "",
+                family_code: "",
+                refugee_name: "",
             }
         }));
     }
