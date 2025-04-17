@@ -357,12 +357,19 @@ export default function EvacuationPage() {
      */
     const showOnlyRegisteredEvacuees = async () => {
         setShowRegisteredEvacuees(!showRegisteredEvacuees);
+        setSelectedOption("");
+        setFamilyCode("");
+        setRefugeeName("");
+        setSelectedStatusOption(!showRegisteredEvacuees?1:"");
         setTableLoading(true);
         await setGetListPayload(prevState => ({
             ...prevState,
             filters: {
                 ...prevState.filters,
-                checkout_flg: showRegisteredEvacuees ? 0 : 1,
+                checkout_flg: showRegisteredEvacuees ? "" : 1,
+                place_id: "",
+                family_code: "",
+                refugee_name: "",
                 start: 0
             }
         }));
@@ -388,22 +395,22 @@ export default function EvacuationPage() {
                             </div>
                             <div className='flex flex-wrap align-items-center gap-2'>
                                 <div className='flex flex-wrap  md:justify-content-end md:align-items-end md:gap-4 gap-2 mb-2'>
-                                    {/* <div class="flex gap-2 align-items-center justify-content-center mt-2 md:mt-0 md:mb-2">
+                                    <div class="flex gap-2 align-items-center justify-content-center mt-2 md:mt-0 md:mb-2">
                                         <span className='text-sm'>{translate(localeJson, 'show_checked_out_evacuees')}</span><InputSwitch inputSwitchProps={{
                                             checked: showRegisteredEvacuees,
                                             onChange: () => showOnlyRegisteredEvacuees()
                                         }}
                                             parentClass={"custom-switch"} />
-                                    </div> */}
+                                    </div>
                                     <div>
-                                        {selectedStatusOption != "1" && (
+                                        {/* {selectedStatusOption != "1" && (
                                             <Tooltip
                                                 target=".custom-target-icon"
                                                 position="bottom"
                                                 content={translate(localeJson, "status_tooltip")}
                                                 className="shadow-none"
                                             />
-                                        )}
+                                        )} */}
                                         <Button buttonProps={{
                                             type: "button",
                                             rounded: "true",
@@ -411,7 +418,7 @@ export default function EvacuationPage() {
                                             buttonClass: "export-button",
                                             text: translate(localeJson, 'bulk_delete'),
                                             severity: "primary",
-                                            disabled: selectedStatusOption != "1"||evacueesDataList.length <= 0,
+                                            disabled: !showRegisteredEvacuees||evacueesDataList.length <= 0,
                                             onClick: () => openDeleteDialog()
                                         }} parentClass={`custom-target-icon export-button`} />
 
