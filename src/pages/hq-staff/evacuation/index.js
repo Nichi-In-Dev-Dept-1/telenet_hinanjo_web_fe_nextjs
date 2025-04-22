@@ -36,6 +36,7 @@ export default function HQEvacuationPage() {
         name: "--",
         id: 0,
     });
+    const [selectedStatusOption, setSelectedStatusOption] = useState("");
     const [evacueesDataList, setEvacueesDataList] = useState([]);
     const [evacuationPlaceList, setEvacuationPlaceList] = useState([]);
     const [tableLoading, setTableLoading] = useState(false);
@@ -54,7 +55,7 @@ export default function HQEvacuationPage() {
             place_id: "",
             family_code: "",
             refugee_name: "",
-            checkout_flg: 0
+            checkout_flg: ""
         },
     });
 
@@ -82,6 +83,7 @@ export default function HQEvacuationPage() {
                 );
             },
         },
+         { field: 'family_is_registered', header: translate(localeJson, 'status'), sortable: true, alignHeader: "left",minWidth: '3rem', maxWidth: '3rem'},
         {
             field: "place_name",
             header: translate(localeJson, "place_name"),
@@ -184,6 +186,22 @@ export default function HQEvacuationPage() {
             return translate(localeJson, "others_count");
         }
     };
+
+    const getOptions = (locale) => {
+        if (locale === "ja") {
+          return [
+            { label: "すべて", value: "" }, // All
+            { label: "入所", value: 0 }, // Check-in
+            { label: "退所", value: 1 } // Check-out
+          ];
+        } else {
+          return [
+            { label: "All", value: "" },
+            { label: "Check-in", value: 0 },
+            { label: "Check-out", value: 1 }
+          ];
+        }
+      };
 
     const getPlaceName = (id) => {
         let data = evacuationPlaceList.find((obj) => obj.id == id);
@@ -289,6 +307,7 @@ export default function HQEvacuationPage() {
                     out_date: item.family_out_date
                         ? getGeneralDateTimeSlashDisplayFormat(item.family_out_date)
                         : "",
+                     "family_is_registered": item.family_is_registered == 1 ? translate(localeJson, 'check_in') : translate(localeJson, 'exit'),
                     yapple_id: item.yapple_id,
                 };
                 let personAnswers = item.person_answers ? item.person_answers : [];
@@ -378,7 +397,7 @@ export default function HQEvacuationPage() {
                     selectedOption && selectedOption.id != 0 ? selectedOption.id : "",
                 family_code: convertToSingleByte(familyCode),
                 refugee_name: refugeeName,
-                checkout_flg: getListPayload.filters.checkout_flg,
+                checkout_flg: selectedStatusOption,
             },
         };
         getList(payload, onGetEvacueesList);
@@ -454,12 +473,20 @@ export default function HQEvacuationPage() {
      */
     const showOnlyRegisteredEvacuees = async () => {
         setShowRegisteredEvacuees(!showRegisteredEvacuees);
+        setShowRegisteredEvacuees(!showRegisteredEvacuees);
+        setSelectedOption("");
+        setFamilyCode("");
+        setRefugeeName("");
+        setSelectedStatusOption(!showRegisteredEvacuees?1:"");
         setTableLoading(true);
         await setGetListPayload(prevState => ({
             ...prevState,
             filters: {
                 ...prevState.filters,
-                checkout_flg: showRegisteredEvacuees ? 0 : 1,
+                checkout_flg: showRegisteredEvacuees ? "" : 1,
+                place_id: "",
+                family_code: "",
+                refugee_name: "",
             }
         }));
     }
@@ -504,6 +531,21 @@ export default function HQEvacuationPage() {
                             <div>
                                 <form>
                                     <div className="modal-field-top-space modal-field-bottom-space flex flex-wrap float-right justify-content-end gap-3 lg:gap-2 md:gap-2 sm:gap-2 mobile-input">
+                                         <InputDropdown inputDropdownProps={{
+                                                                                    inputDropdownParentClassName: "w-full lg:w-14rem md:w-14rem sm:w-10rem",
+                                                                                    labelProps: {
+                                                                                        text: translate(localeJson, 'status_furigana'),
+                                                                                        inputDropdownLabelClassName: "block"
+                                                                                    },
+                                                                                    inputDropdownClassName: "w-full lg:w-14rem md:w-14rem sm:w-10rem",
+                                                                                    customPanelDropdownClassName: "w-10rem",
+                                                                                    value: selectedStatusOption,
+                                                                                    options: getOptions(locale),
+                                                                                    optionLabel: "label",
+                                                                                    onChange: (e) => setSelectedStatusOption(e.value),
+                                                                                    emptyMessage: translate(localeJson, "data_not_found"),
+                                                                                }}
+                                                                                />
                                         <InputDropdown
                                             inputDropdownProps={{
                                                 inputDropdownParentClassName:

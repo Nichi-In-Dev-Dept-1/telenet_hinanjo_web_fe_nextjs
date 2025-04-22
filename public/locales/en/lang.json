@@ -1109,5 +1109,13 @@
     "guide_message":"Make sure that the scanned content is reflected on the screen, and if you need to make corrections, correct them.If there are no problems, select or enter the following items and proceed to the confirmation screen.",
     "plusTek_scan_msg":"Place the keep the card as shown in the sample image below and press the Scan button.",
     "scan":"Scan",
-    "skip_this_step_message": "Do you want to skip this step?"
+    "skip_this_step_message": "Do you want to skip this step?",
+    "my_number_button":"MyNumberCard",
+    "driver_license_button":"Driver's license",
+    "select_card_Option" :"Please select the card.",
+    "status_furigana":"Status",
+     "status_tooltip":"Select the Check out option in the Status drop down.",
+     "db_reset":"Db Reset",
+     "db_reset_message":"Are you sure you want to reset the database? This action will delete all existing data and cannot be undone.",
+    "continue_button":"Continue"
 }

@@ -21,6 +21,7 @@ import {
   compareAddresses,
   geocodeAddressAndExtractData,
   extractAddress,
+  fetchIvuResponse,
 } from "@/helper";
 import {
   prefectures,
@@ -40,6 +41,7 @@ import QrConfirmDialog from "@/components/modal/QrConfirmDialog";
 import YaburuModal from "@/components/modal/yaburuModal";
 import toast from "react-hot-toast";
 import { PerspectiveImageCropping } from "@/components/perspectiveImageCropping";
+import IvuConfirmDialog from "@/components/modal/ivuConfirmDialog";
 
 export default function Admission() {
   const { locale, localeJson, setLoader ,webFxScaner, selectedScannerName } = useContext(LayoutContext);
@@ -82,6 +84,7 @@ export default function Admission() {
   const [openQrPopup, setOpenQrPopup] = useState(false);
   const [QrScanPopupModalOpen, setQrScanPopupModalOpen] = useState(false);
   const [visible, setVisible] = useState(false);
+   const [ivuVisible,setIvuVisible] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isIvuDeviceConnected,setIsIvuDeviceConnected] = useState(false);
   const formikRef = useRef();
@@ -813,53 +816,113 @@ const handleScan = async () => {
     });
   }
 
-  const ivuResult = async () => {
-    setLoader(true);
-    let payload = {
-      client_url:"http://10.8.0.6:50080"
-    }
-    ivuToolRegistration(payload, async (res) => {
-      if (res) {
-        const evacueeArray = res.data.data;
-        let newEvacuee = createEvacuee(evacueeArray);
-        newEvacuee = {
-          ...newEvacuee,
-          isFromFormReader: true
-        };
-        if (!newEvacuee.postalCode || !evacueeArray.prefecture_id) {
-          const address = evacueeArray.fullAddress || evacueeArray.address;
-          try {
-            const { prefecture, postalCode, prefecture_id } = await geocodeAddressAndExtractData(address, localeJson, locale, setLoader);
-
-            // Update newEvacuee with geocoding data
-            newEvacuee = {
-              ...newEvacuee,
-              postalCode: postalCode,
-              prefecture_id: prefecture_id
-            };
-          } catch (error) {
-            console.error("Error fetching geolocation data:", error);
+   const ivuResult = async (cardType) => {
+     // if(window.location.origin === "https://rakuraku.nichi.in"){
+        try{
+          setLoader(true);
+        const res = await fetchIvuResponse(cardType);
+        if (res) {
+          const evacueeArray = res;
+          let newEvacuee = createEvacuee(evacueeArray);
+          newEvacuee = {
+            ...newEvacuee,
+            isFromFormReader: true
+          };
+          if (!newEvacuee.postalCode || !evacueeArray.prefecture_id) {
+            const address = evacueeArray.fullAddress || evacueeArray.address;
+            try {
+              const { prefecture, postalCode, prefecture_id } = await geocodeAddressAndExtractData(address, localeJson, locale, setLoader);
+  
+              // Update newEvacuee with geocoding data
+              newEvacuee = {
+                ...newEvacuee,
+                postalCode: postalCode,
+                prefecture_id: prefecture_id
+              };
+            } catch (error) {
+              console.error("Error fetching geolocation data:", error);
+            }
           }
+          setEditObj(newEvacuee)
+          setRegisterModalAction("edit");
+          setSpecialCareEditOpen(true);
+          setEvacuee((prev) => {
+            return [
+              ...prev, // Use spread operator to include previous items in the array
+              newEvacuee, // Add the newEvacuee to the array
+            ];
+          });
+          formikRef.current.setFieldValue("evacuee", [
+            ...formikRef.current.values.evacuee,
+            newEvacuee,
+          ]);
+          setLoader(false);
+        } else {
+          setLoader(false);
         }
-        setEditObj(newEvacuee)
-        setRegisterModalAction("edit");
-        setSpecialCareEditOpen(true);
-        setEvacuee((prev) => {
-          return [
-            ...prev, // Use spread operator to include previous items in the array
-            newEvacuee, // Add the newEvacuee to the array
-          ];
-        });
-        formikRef.current.setFieldValue("evacuee", [
-          ...formikRef.current.values.evacuee,
-          newEvacuee,
-        ]);
-        setLoader(false);
-      } else {
-        setLoader(false);
-      }
-    });
-  };
+        }
+        catch(err) {
+          setLoader(false)
+          console.log(err)
+  
+        }
+    //   }
+    //   else {
+    //   setLoader(true);
+    //   let payload = {
+    //     client_url:"http://10.8.0.6:50080"
+    //   }
+    //   ivuToolRegistration(payload, async (res) => {
+    //     if (res) {
+    //       const evacueeArray = res.data.data;
+    //       let newEvacuee = createEvacuee(evacueeArray);
+    //       newEvacuee = {
+    //         ...newEvacuee,
+    //         isFromFormReader: true
+    //       };
+    //       if (!newEvacuee.postalCode || !evacueeArray.prefecture_id) {
+    //         const address = evacueeArray.fullAddress || evacueeArray.address;
+    //         try {
+    //           const { prefecture, postalCode, prefecture_id } = await geocodeAddressAndExtractData(address, localeJson, locale, setLoader);
+  
+    //           // Update newEvacuee with geocoding data
+    //           newEvacuee = {
+    //             ...newEvacuee,
+    //             postalCode: postalCode,
+    //             prefecture_id: prefecture_id
+    //           };
+    //         } catch (error) {
+    //           console.error("Error fetching geolocation data:", error);
+    //         }
+    //       }
+    //       setEditObj(newEvacuee)
+    //       setRegisterModalAction("edit");
+    //       setSpecialCareEditOpen(true);
+    //       setEvacuee((prev) => {
+    //         return [
+    //           ...prev, // Use spread operator to include previous items in the array
+    //           newEvacuee, // Add the newEvacuee to the array
+    //         ];
+    //       });
+    //       formikRef.current.setFieldValue("evacuee", [
+    //         ...formikRef.current.values.evacuee,
+    //         newEvacuee,
+    //       ]);
+    //       setLoader(false);
+    //     } else {
+    //       setLoader(false);
+    //     }
+    //   });
+    // }
+    };
+
+    const checkCardType = async() => {
+      let isMyNumber = localStorage.getItem("myNumber")=="true";
+      let isDrivingLicense = localStorage.getItem("driverLicense")=="true";
+      // checkDeviceConnection()
+      isMyNumber && ivuResult("MYNUMBER");
+      isDrivingLicense && ivuResult("DRVLIC");
+    }
   const handleRecordingStateChange = (isRecord) => {
     setMIsRecording(isRecord);
     setIsRecording(isRecord);
@@ -1093,6 +1156,14 @@ const createEditObj = (rowData) => {
         callback={qrResult}
         setOpenQrPopup={setOpenQrPopup}
       ></QrScannerModal>
+      <IvuConfirmDialog
+             visible={ivuVisible}
+             setVisible={setIvuVisible}
+             onCardSelected={(type) => {
+                checkCardType();
+              // 👉 Do whatever you want here — call API, update state, etc.
+            }}
+            ></IvuConfirmDialog>
       <QrConfirmDialog
         visible={visible}
         setVisible={setVisible}
@@ -1259,8 +1330,6 @@ const createEditObj = (rowData) => {
                           <i className="custom-target-icon-2 pi pi-info-circle"></i>
                         </div>
                       </div>
-                      { ((window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" )) && 
-                          (
                       <div className="flex items-center">
                         <ButtonRounded
                           buttonProps={{
@@ -1272,7 +1341,7 @@ const createEditObj = (rowData) => {
                             text: translate(localeJson, "c_card_reg_ivu"),
                             icon: <img src={Card.url} width={30} height={30} />,
                             onClick: () => {
-                              isIvuDeviceConnected?ivuResult():
+                              isIvuDeviceConnected?setIvuVisible(true):
                               toast.error(locale=="en"?'Please check if the identity verification device is connected.':' 本人確認装置が接続されているかご確認ください。', {
                                 position: "top-right",
                               });
@@ -1292,7 +1361,7 @@ const createEditObj = (rowData) => {
                           />
                           <i className="custom-target-icon-3 pi pi-info-circle"></i>
                         </div>
-                      </div>)}
+                      </div>
                     </div>
                     <div className="mt-3">
                       <div className="grid">

@@ -13,6 +13,7 @@ import {
   geocodeAddressAndExtractData,
   extractAddress,
   fetchIvuResponse,
+  convertNameToKatakana,
   // transformData,
 } from "@/helper";
 import {
@@ -44,6 +45,7 @@ import YaburuModal from "./yaburuModal";
 import QrConfirmDialog from "./QrConfirmDialog";
 import toast from "react-hot-toast";
 import { PerspectiveImageCropping } from "../perspectiveImageCropping";
+import IvuConfirmDialog from "./ivuConfirmDialog";
 export default function EvacueeTempRegModal(props) {
   const { localeJson, locale, setLoader,webFxScaner,selectedScannerName } = useContext(LayoutContext);
   const layoutReducer = useAppSelector((state) => state.layoutReducer);
@@ -322,6 +324,13 @@ export default function EvacueeTempRegModal(props) {
         }
       }, 1000);
       setFetchedZipCode(editObj.postalCode)
+
+        // Auto-fill furigana if needed
+  if (!editObj?.name_furigana && editObj.name) {
+    convertNameToKatakana(editObj.name).then((katakana) => {
+      formikRef.current.setFieldValue("name_furigana",formikRef.current?.values?.name_furigana || katakana);
+    });
+  }
       
       if(editObj?.postalCode)
       {
@@ -440,6 +449,7 @@ async function fetchIvuData() {
   const [openQrPopup, setOpenQrPopup] = useState(false);
   const [QrScanPopupModalOpen, setQrScanPopupModalOpen] = useState(false);
   const [visible,setVisible] = useState(false);
+  const [ivuVisible,setIvuVisible] = useState(false);
 
   const closeQrPopup = () => {
     setOpenQrPopup(false);
@@ -489,36 +499,41 @@ async function fetchIvuData() {
     });
   };
 
-  const ivuResult = async() => {
-    if(window.location.origin === "https://rakuraku.nichi.in"){
+  const ivuResult = async(cardType) => {
       try{
-        setLoader(true);
-      const evacueeArray = await fetchIvuResponse();
+      setLoader(true);
+      const evacueeArray = await fetchIvuResponse(cardType);
       formikRef.current.resetForm();
       createEvacuee(evacueeArray, formikRef.current.setFieldValue);
       setLoader(false);
-      return
       }
       catch(err) {
         setLoader(false)
         console.log(err)
 
       }
-    }
-    setLoader(true);
-    let payload = {
-      client_url:"http://10.8.0.6:50080"
-    }
-    ivuToolRegistration(payload, (res) => {
-      if (res) {
-        const evacueeArray = res.data.data;
-        formikRef.current.resetForm();
-        createEvacuee(evacueeArray, formikRef.current.setFieldValue);
-        setLoader(false);
-      } else {
-        setLoader(false);
-      }
-    });
+    // setLoader(true);
+    // let payload = {
+    //   client_url:"http://10.8.0.6:50080"
+    // }
+    // ivuToolRegistration(payload, (res) => {
+    //   if (res) {
+    //     const evacueeArray = res.data.data;
+    //     formikRef.current.resetForm();
+    //     createEvacuee(evacueeArray, formikRef.current.setFieldValue);
+    //     setLoader(false);
+    //   } else {
+    //     setLoader(false);
+    //   }
+    // });
+  }
+
+  const checkCardType = async() => {
+    let isMyNumber = localStorage.getItem("myNumber")=="true";
+    let isDrivingLicense = localStorage.getItem("driverLicense")=="true";
+    // checkDeviceConnection()
+    isMyNumber && ivuResult("MYNUMBER");
+    isDrivingLicense && ivuResult("DRVLIC");
   }
 
   async function createEvacuee(evacuees, setFieldValue) {
@@ -535,8 +550,6 @@ async function fetchIvuData() {
       }
     }
     setFieldValue("name", evacuees.name || "");
-    setFieldValue("name_furigana", (evacuees.refugeeName || evacuees.refugee_name) || "");
-    // setFieldValue("age", evacuees.age || "");
     // setFieldValue("age_m", evacuees.month || "");
     setFieldValue("gender", evacuees.gender ? parseInt(evacuees.gender) : "");
     setFieldValue("tel", evacuees.tel || "");
@@ -582,6 +595,11 @@ async function fetchIvuData() {
       setFieldValue("dob", convertedObject || "");
     }
     setFieldValue("connecting_code", evacuees.connecting_code);
+    evacuees.refugeeName
+  ? setFieldValue("name_furigana", evacuees.refugeeName)
+  : convertNameToKatakana(evacuees.name).then(katakana => setFieldValue("name_furigana", katakana));
+
+    // setFieldValue("age", evacuees.age || "");
   }
 
   function calculateAge(birthdate) {
@@ -878,6 +896,14 @@ async function fetchIvuData() {
        setOpenQrPopup={setOpenQrPopup}
        setQrScanPopupModalOpen={setQrScanPopupModalOpen}
       ></QrConfirmDialog>
+      <IvuConfirmDialog 
+       visible={ivuVisible}
+       setIvuVisible={setIvuVisible}
+       onCardSelected={(type) => {
+          checkCardType();
+        // 👉 Do whatever you want here — call API, update state, etc.
+      }}
+      ></IvuConfirmDialog>
        <YaburuModal
           open={QrScanPopupModalOpen}
           close={closeQrScanPopup}
@@ -1157,8 +1183,6 @@ async function fetchIvuData() {
                         </div>
                         
                         </div>
-                        { ((window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" ||window.location.origin === "https://rakuraku.nichi.in")) && 
-                          (
                         <div className="flex items-center">
                         <ButtonRounded
                           buttonProps={{
@@ -1170,7 +1194,7 @@ async function fetchIvuData() {
                             text: translate(localeJson, "c_card_reg_ivu"),
                             icon: <img src={Card.url} width={30} height={30} />,
                             onClick: () => {
-                              isIvuDeviceConnected?ivuResult():
+                              isIvuDeviceConnected?setIvuVisible(true):
                               toast.error(locale=="en"?'Please check if the identity verification device is connected.':' 本人確認装置が接続されているかご確認ください。', {
                                 position: "top-right",
                               });
@@ -1184,7 +1208,7 @@ async function fetchIvuData() {
                           <Tooltip target=".custom-target-icon-3" position="bottom" content={translate(localeJson, "c_card_reg_ivu_msg")} className="shadow-none" />
                           <i className="custom-target-icon-3 pi pi-info-circle"></i>
                         </div>
-                      </div>)}
+                      </div>
                     </div>
                     <div className="pl-5 pr-5">
                       <div className="mb-2 col-12">

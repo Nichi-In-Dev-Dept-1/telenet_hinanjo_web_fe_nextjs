@@ -19,6 +19,7 @@ import { useAppDispatch } from '@/redux/hooks';
 import { getSpecialCareName } from "@/helper";
 import { EvacuationServices } from '@/services';
 import { AdminManagementDeleteModal } from '@/components/modal';
+import { Tooltip } from 'primereact/tooltip';
 
 export default function EvacuationPage() {
     const { locale, localeJson } = useContext(LayoutContext);
@@ -30,6 +31,7 @@ export default function EvacuationPage() {
         name: "--",
         id: 0
     });
+    const [selectedStatusOption, setSelectedStatusOption] = useState("");
     const [evacueesDataList, setEvacueesDataList] = useState([]);
     const [evacuationPlaceList, setEvacuationPlaceList] = useState([]);
     const [tableLoading, setTableLoading] = useState(false);
@@ -48,7 +50,7 @@ export default function EvacuationPage() {
             place_id: "",
             family_code: "",
             refugee_name: "",
-            checkout_flg: 0
+            checkout_flg: "",
         }
     });
 
@@ -63,10 +65,11 @@ export default function EvacuationPage() {
                 </div>
             },
         },
+        { field: 'family_is_registered', header: translate(localeJson, 'status_furigana'), sortable: true, alignHeader: "left",minWidth: '3rem', maxWidth: '4rem'},
         { field: 'place_name', header: translate(localeJson, 'place_name'), sortable: false, textAlign: "center", alignHeader: "center", minWidth: '3rem', maxWidth: '3rem' },
-        { field: 'family_code', header: translate(localeJson, 'family_code'), sortable: true, textAlign: "center", alignHeader: "center", minWidth: '3rem', maxWidth: '3rem' },
+        { field: 'family_code', header: translate(localeJson, 'family_code'), sortable: true, textAlign: "center", alignHeader: "center", minWidth: '3rem', maxWidth: '4rem' },
         { field: 'family_count', header: translate(localeJson, 'family_count'), sortable: false, textAlign: "center", alignHeader: "center", minWidth: '3rem', maxWidth: '3rem' },
-        { field: "person_dob", header: translate(localeJson, 'dob'), sortable: true, textAlign: 'left', alignHeader: "left", minWidth: '3rem', maxWidth: '3rem' },
+        { field: "person_dob", header: translate(localeJson, 'dob'), sortable: true, textAlign: 'left', alignHeader: "left", minWidth: '3rem', maxWidth: '4rem' },
         { field: "person_age", header: translate(localeJson, 'age'), sortable: true, textAlign: 'center', alignHeader: "center", minWidth: '3rem', maxWidth: '3rem' },
         { field: "person_gender", header: translate(localeJson, 'gender'), sortable: true, textAlign: 'left', alignHeader: "left", minWidth: '3rem', maxWidth: '3rem' },
         { field: "special_care_name", header: translate(localeJson, 'c_special_care'), sortable: false, textAlign: 'left', alignHeader: "left", minWidth: '3rem', maxWidth: '3rem' },
@@ -108,6 +111,23 @@ export default function EvacuationPage() {
         }
         return ""
     }
+
+    const getOptions = (locale) => {
+        if (locale === "ja") {
+          return [
+            { label: "すべて", value: "" }, // All
+            { label: "入所", value: 0 }, // Check-in
+            { label: "退所", value: 1 } // Check-out
+          ];
+        } else {
+          return [
+            { label: "All", value: "" },
+            { label: "Check-in", value: 0 },
+            { label: "Check-out", value: 1 }
+          ];
+        }
+      };
+      
 
     const onGetEvacueesList = (response) => {
         var evacuationColumns = [...evacuationTableColumns];
@@ -167,6 +187,7 @@ export default function EvacuationPage() {
                     "place": item.place_id ? getPlaceName(item.place_id) : "",
                     "connecting_code": item.person_connecting_code,
                     "out_date": item.family_out_date ? getGeneralDateTimeSlashDisplayFormat(item.family_out_date) : "",
+                    "family_is_registered": item.family_is_registered == 1 ? translate(localeJson, 'check_in') : translate(localeJson, 'exit'),
                 };
                 let personAnswers = item.person_answers ? item.person_answers : []
                 if (personAnswers.length > 0) {
@@ -242,7 +263,7 @@ export default function EvacuationPage() {
                 place_id: selectedOption && selectedOption.id != 0 ? selectedOption.id : "",
                 family_code: convertToSingleByte(familyCode),
                 refugee_name: refugeeName,
-                checkout_flg: getListPayload.filters.checkout_flg,
+                checkout_flg: selectedStatusOption,
             }
         }
         getList(payload, onGetEvacueesList);
@@ -336,12 +357,19 @@ export default function EvacuationPage() {
      */
     const showOnlyRegisteredEvacuees = async () => {
         setShowRegisteredEvacuees(!showRegisteredEvacuees);
+        setSelectedOption("");
+        setFamilyCode("");
+        setRefugeeName("");
+        setSelectedStatusOption(!showRegisteredEvacuees?1:"");
         setTableLoading(true);
         await setGetListPayload(prevState => ({
             ...prevState,
             filters: {
                 ...prevState.filters,
-                checkout_flg: showRegisteredEvacuees ? 0 : 1,
+                checkout_flg: showRegisteredEvacuees ? "" : 1,
+                place_id: "",
+                family_code: "",
+                refugee_name: "",
                 start: 0
             }
         }));
@@ -375,6 +403,14 @@ export default function EvacuationPage() {
                                             parentClass={"custom-switch"} />
                                     </div>
                                     <div>
+                                        {/* {selectedStatusOption != "1" && (
+                                            <Tooltip
+                                                target=".custom-target-icon"
+                                                position="bottom"
+                                                content={translate(localeJson, "status_tooltip")}
+                                                className="shadow-none"
+                                            />
+                                        )} */}
                                         <Button buttonProps={{
                                             type: "button",
                                             rounded: "true",
@@ -384,7 +420,9 @@ export default function EvacuationPage() {
                                             severity: "primary",
                                             disabled: !showRegisteredEvacuees||evacueesDataList.length <= 0,
                                             onClick: () => openDeleteDialog()
-                                        }} parentClass={"export-button"} />
+                                        }} parentClass={`custom-target-icon export-button`} />
+
+                                                                
                                     </div>
                                 </div>
                                 <div>
@@ -403,6 +441,21 @@ export default function EvacuationPage() {
                             <div>
                                 <form>
                                     <div className='modal-field-top-space modal-field-bottom-space flex flex-wrap float-right justify-content-end gap-3 lg:gap-2 md:gap-2 sm:gap-2 mobile-input'>
+                                    <InputDropdown inputDropdownProps={{
+                                            inputDropdownParentClassName: "w-full lg:w-14rem md:w-14rem sm:w-10rem",
+                                            labelProps: {
+                                                text: translate(localeJson, 'status_furigana'),
+                                                inputDropdownLabelClassName: "block"
+                                            },
+                                            inputDropdownClassName: "w-full lg:w-14rem md:w-14rem sm:w-10rem",
+                                            customPanelDropdownClassName: "w-10rem",
+                                            value: selectedStatusOption,
+                                            options: getOptions(locale),
+                                            optionLabel: "label",
+                                            onChange: (e) => setSelectedStatusOption(e.value),
+                                            emptyMessage: translate(localeJson, "data_not_found"),
+                                        }}
+                                        />
                                         <InputDropdown inputDropdownProps={{
                                             inputDropdownParentClassName: "w-full lg:w-14rem md:w-14rem sm:w-10rem",
                                             labelProps: {
