@@ -1183,8 +1183,6 @@ async function fetchIvuData() {
                         </div>
                         
                         </div>
-                        { ((window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000" ||window.location.origin === "https://rakuraku.nichi.in")) && 
-                          (
                         <div className="flex items-center">
                         <ButtonRounded
                           buttonProps={{
@@ -1210,7 +1208,7 @@ async function fetchIvuData() {
                           <Tooltip target=".custom-target-icon-3" position="bottom" content={translate(localeJson, "c_card_reg_ivu_msg")} className="shadow-none" />
                           <i className="custom-target-icon-3 pi pi-info-circle"></i>
                         </div>
-                      </div>)}
+                      </div>
                     </div>
                     <div className="pl-5 pr-5">
                       <div className="mb-2 col-12">
