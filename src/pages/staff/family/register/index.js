@@ -1330,8 +1330,6 @@ const createEditObj = (rowData) => {
                           <i className="custom-target-icon-2 pi pi-info-circle"></i>
                         </div>
                       </div>
-                      { ((window.location.origin === "https://hinanjo.nichi.in" || window.location.origin === "http://localhost:3000"|| window.location.origin === "https://rakuraku.nichi.in" )) && 
-                          (
                       <div className="flex items-center">
                         <ButtonRounded
                           buttonProps={{
@@ -1363,7 +1361,7 @@ const createEditObj = (rowData) => {
                           />
                           <i className="custom-target-icon-3 pi pi-info-circle"></i>
                         </div>
-                      </div>)}
+                      </div>
                     </div>
                     <div className="mt-3">
                       <div className="grid">
