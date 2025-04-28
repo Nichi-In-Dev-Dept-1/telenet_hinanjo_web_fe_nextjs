@@ -1,16 +1,47 @@
 import React, { useContext } from "react"
 import { Dialog } from 'primereact/dialog';
-
-import { Button } from "@/components"; 
+import * as Yup from "yup";
+import { Button, Input,ValidationError } from "@/components"; 
 import { getValueByKeyRecursively as translate } from "@/helper";
 import { LayoutContext } from "@/layout/context/layoutcontext";
+import { Formik } from "formik";
 
 export default function DbResetModal(props) {
     const { localeJson } = useContext(LayoutContext);
     const { open, close } = props && props;
+    const initialValues = {
+        secretKey:"",
+    };
+
+      const schema = Yup.object().shape({
+        secretKey: Yup.string()
+                .required(translate(localeJson, 'secret_key_required'))
+        });
 
     return (
-        <div>
+        <>
+              <Formik
+                            validationSchema={schema}
+                            enableReinitialize={true}
+                            initialValues={initialValues}
+                            onSubmit={(values, { resetForm }) => {
+                                setTimeout(() => {
+                                    close("confirm", values.secretKey);
+                                }, 1000);
+
+                            }}
+                        >
+                            {({
+                                values,
+                                errors,
+                                touched,
+                                handleChange,
+                                handleBlur,
+                                setFieldValue,
+                                handleSubmit,
+                                resetForm
+                            }) => (
+                                <div>
             <Dialog
                 className="new-custom-modal"
                 header={
@@ -31,6 +62,34 @@ export default function DbResetModal(props) {
                         <div className="modal-field-bottom-space text-center">
                             <p>{translate(localeJson, 'db_reset_message')}</p>
                         </div>
+                        <div className="modal-field-bottom-space">
+                               <div className="modal-field-top-space modal-field-bottom-space">
+                                                      <Input
+                                                        inputProps={{
+                                                          inputParentClassName: `custom_input ${errors.secretKey && touched.secretKey && "p-invalid pb-1"}`,
+                                                          labelProps: {
+                                                            text: translate(localeJson, 'please_enter_secret_key'),
+                                                            inputLabelClassName: "block",
+                                                            spanText: "*",
+                                                            inputLabelSpanClassName: "p-error",
+                                                          },
+                                                          inputClassName: "w-full",
+                                                          value: values.secretKey,
+                                                          onChange: handleChange,
+                                                          onBlur: handleBlur,
+                                                          id: "secretKey",
+                                                          name: "secretKey",
+                                                        }}
+                                                      />
+                                                      <ValidationError
+                                                        errorBlock={
+                                                          errors.secretKey &&
+                                                          touched.secretKey &&
+                                                          errors.secretKey
+                                                        }
+                                                      />
+                                                    </div>
+                            </div>
                         {
                             props.deleteObj &&
                             (<div className="flex justify-center px-4 mt-2">
@@ -46,7 +105,7 @@ export default function DbResetModal(props) {
                                     buttonClass: "w-full del_ok-button",
                                     type: "submit",
                                     text: translate(localeJson, 'continue_button'),
-                                    onClick: () => close("confirm"),
+                                    onClick: () => handleSubmit(),
                                 }} parentClass={"del_ok-button"} />
                             </div>
                             <div >
@@ -60,6 +119,9 @@ export default function DbResetModal(props) {
                     </div>
                 </div>
             </Dialog>
-        </div>
+            </div>
+               )}
+                        </Formik>
+        </>
     );
 }
