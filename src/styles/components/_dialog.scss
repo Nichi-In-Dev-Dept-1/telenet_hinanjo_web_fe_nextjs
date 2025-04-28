@@ -69,6 +69,10 @@
     border-radius: $commonRadius;
 }
 
+.new-custom-modal .p-tabview-nav-next {
+    right: -10px;
+}
+
 .modal-content {
     font-size: $commonFontSize;
 }

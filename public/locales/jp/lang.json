@@ -1113,5 +1113,7 @@
       "status_tooltip":"ステータスの選択項目で退所オプションを選択してください。",
       "db_reset":"DBリセット",
       "db_reset_message":"データベースをリセットしてもよろしいですか？この操作は既存のデータをすべて削除し、元に戻すことはできません。",
-      "continue_button":"続ける"
+      "continue_button":"続ける",
+      "please_enter_secret_key":"シークレットキーを入力してください。",
+      "secret_key_required":"シークレットキーは必須です。"
 }

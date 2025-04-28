@@ -304,9 +304,12 @@ export default function Setting() {
     setLoader(false);
   };
 
-      const onConfirmDeleteRegisteredEvacuees = async () => {
+      const onConfirmDeleteRegisteredEvacuees = async (key) => {
         setLoader(true);
-          bulkDelete((res) => {
+        let payload = {
+          SECRET_KEY: key,
+        };
+          bulkDelete(payload,(res) => {
               if (res) {
                   setLoader(false);
               }
@@ -322,9 +325,9 @@ export default function Setting() {
           hideOverFlow();
       }
   
-      const onDeleteClose = (status = '') => {
+      const onDeleteClose = (status = '',secretKey = '') => {
           if (status == 'confirm') {
-              onConfirmDeleteRegisteredEvacuees();
+              onConfirmDeleteRegisteredEvacuees(secretKey);
           }
           setDeleteOpen(false);
           showOverFlow();
@@ -410,10 +413,21 @@ export default function Setting() {
           <div className="grid">
             <div className="col-12">
               <div className="card">
+                <div className="flex flex-wrap justify-content-between align-items-center mb-2">
                 <CustomHeader
                   headerClass={"page-header1"}
                   header={translate(localeJson, "setting_systems")}
                 />
+                     <Button buttonProps={{
+                                                                type: "button",
+                                                                rounded: "true",
+                                                                delete: true,
+                                                                buttonClass: "w-10rem update-button",
+                                                                text: translate(localeJson, 'db_reset'),
+                                                                severity: "primary",
+                                                                onClick: () => openDeleteDialog()
+                                                            }} parentClass={"inline  update-button"} />
+                                                            </div>
                 <form onSubmit={handleSubmit}>
                   <div className="">
                     <div className="pb-1 pt-2">
@@ -946,15 +960,7 @@ export default function Setting() {
                       }}
                       parentClass={"inline update-button"}
                     />
-                     <Button buttonProps={{
-                                                                type: "button",
-                                                                rounded: "true",
-                                                                delete: true,
-                                                                buttonClass: "w-10rem update-button",
-                                                                text: translate(localeJson, 'db_reset'),
-                                                                severity: "primary",
-                                                                onClick: () => openDeleteDialog()
-                                                            }} parentClass={"inline mt-3 update-button"} />
+                
                   </div>
                 </form>
               </div>
