@@ -27,6 +27,7 @@ export default function DbResetModal(props) {
                             onSubmit={(values, { resetForm }) => {
                                 setTimeout(() => {
                                     close("confirm", values.secretKey);
+                                    resetForm({ values: initialValues });
                                 }, 1000);
 
                             }}
