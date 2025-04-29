@@ -19,7 +19,7 @@ import {
   InputNumber,
 } from "@/components";
 import { mapScaleRateOptions } from "@/utils/constant";
-import { systemSettingServices } from "@/services";
+import { CommonServices, systemSettingServices } from "@/services";
 import { setLayout } from "@/redux/layout";
 import { useAppDispatch } from "@/redux/hooks";
 import DbResetModal from "@/components/modal/dbResetModal";
@@ -52,6 +52,7 @@ export default function Setting() {
   );
 
   const { getList, update, bulkDelete } = systemSettingServices;
+    const { encryptPassword } = CommonServices;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -307,7 +308,7 @@ export default function Setting() {
       const onConfirmDeleteRegisteredEvacuees = async (key) => {
         setLoader(true);
         let payload = {
-          SECRET_KEY: key,
+          SECRET_KEY: encryptPassword(key, process.env.NEXT_PUBLIC_PASSWORD_ENCRYPTION_KEY),
         };
           bulkDelete(payload,(res) => {
               if (res) {

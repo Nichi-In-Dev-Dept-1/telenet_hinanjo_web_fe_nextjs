@@ -19,7 +19,8 @@ export const CommonServices = {
     getAddress: _getAddress,
     getAddressFromZipCode: _getAddressFromZip,
     getZipCodeFromAddress: _getZipCodeFromAddress,
-    convertToKatakana: _convertToKatakana
+    convertToKatakana: _convertToKatakana,
+    encryptPassword: _encryptPassword
 };
 
 /**
@@ -154,6 +155,37 @@ function _decryptPassword(encryptedData, encryptionKey) {
         }
         else return null
     }
+}
+
+function _encryptPassword(password, encryptionKey) {
+    if (!password || !encryptionKey) return null;
+
+    // Parse the encryption key (it's base64 encoded from Laravel)
+    const cryptoJsKey = CryptoJS.enc.Base64.parse(encryptionKey);
+
+    // Generate a random IV (Laravel uses 16 bytes IV for AES-256-CBC)
+    const iv = CryptoJS.lib.WordArray.random(16);
+
+    // Encrypt the password
+    const encrypted = CryptoJS.AES.encrypt(`"${password}"`, cryptoJsKey, { iv: iv });
+
+    const encryptedValue = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+
+    // Calculate the MAC (HMAC-SHA256 of iv + encryptedValue)
+    const mac = CryptoJS.HmacSHA256(
+        CryptoJS.enc.Hex.parse(iv.toString(CryptoJS.enc.Hex) + encrypted.ciphertext.toString(CryptoJS.enc.Hex)),
+        cryptoJsKey
+    ).toString(CryptoJS.enc.Hex);
+
+    // Build the JSON object like Laravel does
+    const encryptedPayload = {
+        iv: CryptoJS.enc.Base64.stringify(iv),
+        value: encryptedValue,
+        mac: mac
+    };
+
+    // Base64 encode the JSON
+    return btoa(JSON.stringify(encryptedPayload));
 }
 
 /**
