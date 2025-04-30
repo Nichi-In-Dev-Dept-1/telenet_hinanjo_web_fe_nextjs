@@ -36,9 +36,9 @@ function _updateSystemSetting(payload, callBackFun) {
     });
 }
 
-function _bulkDeleteSystemSetting(callBackFun) {
+function _bulkDeleteSystemSetting(payload,callBackFun) {
   axios
-    .post(`/admin/reset-database`)
+    .post(`/admin/reset-database`, payload)
     .then((response) => {
       if (response && response.data) {
         callBackFun(response.data);
