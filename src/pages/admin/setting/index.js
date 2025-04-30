@@ -423,7 +423,7 @@ export default function Setting() {
                                                                 type: "button",
                                                                 rounded: "true",
                                                                 delete: true,
-                                                                buttonClass: "w-10rem update-button",
+                                                                buttonClass: "w-12rem update-button",
                                                                 text: translate(localeJson, 'data_reset'),
                                                                 severity: "primary",
                                                                 onClick: () => openDeleteDialog()
