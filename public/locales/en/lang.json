@@ -1116,8 +1116,11 @@
     "status_furigana":"Status",
      "status_tooltip":"Select the Check out option in the Status drop down.",
      "db_reset":"Db Reset",
-     "db_reset_message":"Are you sure you want to reset the database? This action will delete all existing data and cannot be undone.",
+     "data_reset":"Reset Data",
+     "db_reset_message1":"Are you sure you want to reset (initialize) your data?",
+     "db_reset_message2":"This action will permanently delete all your data and cannot be undone.",
+     "db_reset_message3":"A secret key is required to reset your data.",
     "continue_button":"Continue",
-     "please_enter_secret_key":"Please enter the secret key.",
+     "please_enter_secret_key":"To proceed, please enter your secret key.",
     "secret_key_required":"The secret key is required."
 }

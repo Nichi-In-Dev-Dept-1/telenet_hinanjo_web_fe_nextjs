@@ -47,21 +47,26 @@ export default function DbResetModal(props) {
                 className="new-custom-modal"
                 header={
                     <div className="new-custom-modal text-center">
-                        {translate(localeJson, 'db_reset')}
+                        {translate(localeJson, 'data_reset')}
                     </div>
                 }
                 visible={open}
                 draggable={false}
                 blockScroll={true}
-                onHide={() => close()}
+                onHide={() => 
+                    {
+                        resetForm({ values: initialValues });
+                        close()}}
             >
                 <div className={`modal-content`} style={{ padding: "0 0" }}>
                     <div className="flex flex-column justify-center">
                         <div className="modal-header">
                             {translate(localeJson, 'db_reset')}
                         </div>
-                        <div className="modal-field-bottom-space text-center">
-                            <p>{translate(localeJson, 'db_reset_message')}</p>
+                        <div className="modal-field-bottom-space">
+                            <p>{translate(localeJson, 'db_reset_message1')}</p>
+                            <p>{translate(localeJson, 'db_reset_message2')}</p>
+                            <p>{translate(localeJson, 'db_reset_message3')}</p>
                         </div>
                         <div className="modal-field-bottom-space">
                                <div className="modal-field-top-space modal-field-bottom-space">
@@ -113,7 +118,10 @@ export default function DbResetModal(props) {
                                 <Button buttonProps={{
                                     buttonClass: "w-full back-button",
                                     text: translate(localeJson, 'cancel'),
-                                    onClick: () => close(),
+                                    onClick: () =>{ 
+                                        resetForm({ values: initialValues }); 
+                                        close()
+                                    },
                                 }} parentClass={"back-button"} />
                             </div>
                         </div>
