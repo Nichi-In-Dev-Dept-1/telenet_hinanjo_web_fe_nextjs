@@ -424,7 +424,7 @@ export default function Setting() {
                                                                 rounded: "true",
                                                                 delete: true,
                                                                 buttonClass: "w-10rem update-button",
-                                                                text: translate(localeJson, 'db_reset'),
+                                                                text: translate(localeJson, 'data_reset'),
                                                                 severity: "primary",
                                                                 onClick: () => openDeleteDialog()
                                                             }} parentClass={"inline  update-button"} />
