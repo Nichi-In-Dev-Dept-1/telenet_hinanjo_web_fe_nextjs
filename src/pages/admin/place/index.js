@@ -201,7 +201,7 @@ export default function AdminPlacePage() {
           index: getPayload.filters.start + i + 1,
           ID: obj.id,
           refugee_name:locale === "en" && !_.isNull(obj.name_en) ? obj.name_en : obj.name,
-          address: "〒" + obj.address_place,
+          address: obj.address_place.trim() != "000-0000"?"〒" + obj.address_place:"-",
           total_place: obj.total_place,
           tel: obj.tel,
           active_flg: obj.active_flg,
