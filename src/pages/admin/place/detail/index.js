@@ -67,12 +67,12 @@ export default function StaffManagementEditPage() {
     setTableLoading(true);
     setLoader(true);
     const model = response.data.model;
-    setPlaceName(model.name);
+    setPlaceName(locale=="ja"?model.name:(model.name_en||model.name));
     setZipCode(model.zip_code);
-    setAddress(model.address != "000-0000"? model.address : "-");
+    setAddress(model.address != "000-0000"? (locale=="ja"?model.address:(model.address_en||model.address)): "-");
     setPlaceAddress(model.address_place);
     setDefaultZipCode(model.zip_code_default)
-    setAddressDefault(model.address_default != "000-0000"? model.address_default : "-");
+    setAddressDefault(model.address_default != "000-0000"?(locale=="ja"?model.address_default:(model.address_default_en||model.address_default)) : "-");
     setCapacity(`${model.total_place}人`);
     setPhoneNumber(model.tel);
     setCoordinates(`${model.map.latitude} / ${model.map.longitude}`);
