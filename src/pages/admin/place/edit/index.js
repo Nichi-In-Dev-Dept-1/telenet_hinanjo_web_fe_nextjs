@@ -165,7 +165,7 @@ export default function PlaceUpdatePage() {
         }
       }),
     prefecture_id: Yup.string().required(
-      translate(localeJson, "prefecture_place") +
+      translate(localeJson, "prefecture_places") +
       translate(localeJson, "is_required")
     ),
     address: Yup.string()
@@ -337,20 +337,20 @@ export default function PlaceUpdatePage() {
     initialValuesPayload.name = model.name || "";
     initialValuesPayload.refugee_name = model.refugee_name || "";
     initialValuesPayload.name_en = model.name_en || "";
-    initialValuesPayload.postal_code_1 = model.zip_code
+    initialValuesPayload.postal_code_1 = model.zip_code != "000-0000" && model.zip_code
       ? model.zip_code.split("-")[0]
       : "";
-    initialValuesPayload.postal_code_2 = model.zip_code
+    initialValuesPayload.postal_code_2 = model.zip_code != "000-0000" && model.zip_code
       ? model.zip_code.split("-")[1]
       : "";
     initialValuesPayload.prefecture_id = model.prefecture_id || null;
     initialValuesPayload.address = model.address || "";
     initialValuesPayload.prefecture_en_id = model.prefecture_en_id || null;
     initialValuesPayload.address_en = model.address_en || "";
-    initialValuesPayload.postal_code_default_1 = model.zip_code_default
+    initialValuesPayload.postal_code_default_1 = model.zip_code_default != "000-0000" && model.zip_code_default
       ? model.zip_code_default.split("-")[0]
       : "";
-    initialValuesPayload.postal_code_default_2 = model.zip_code_default
+    initialValuesPayload.postal_code_default_2 = model.zip_code_default != "000-0000" && model.zip_code_default
       ? model.zip_code_default.split("-")[1]
       : "";
     initialValuesPayload.prefecture_id_default = model.prefecture_id_default || null;

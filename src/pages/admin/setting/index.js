@@ -313,6 +313,7 @@ export default function Setting() {
           bulkDelete(payload,(res) => {
               if (res) {
                   setLoader(false);
+                  getList(fetchData);
               }
               else {
                   setLoader(false);

@@ -67,12 +67,12 @@ export default function StaffManagementEditPage() {
     setTableLoading(true);
     setLoader(true);
     const model = response.data.model;
-    setPlaceName(model.name);
+    setPlaceName(locale=="ja"?model.name:(model.name_en||model.name));
     setZipCode(model.zip_code);
-    setAddress(model.address);
+    setAddress(model.address != "000-0000"? (locale=="ja"?model.address:(model.address_en||model.address)): "-");
     setPlaceAddress(model.address_place);
     setDefaultZipCode(model.zip_code_default)
-    setAddressDefault(model.address_default);
+    setAddressDefault(model.address_default != "000-0000"?(locale=="ja"?model.address_default:(model.address_default_en||model.address_default)) : "-");
     setCapacity(`${model.total_place}人`);
     setPhoneNumber(model.tel);
     setCoordinates(`${model.map.latitude} / ${model.map.longitude}`);
@@ -85,8 +85,8 @@ export default function StaffManagementEditPage() {
     setApiResponse(model);
     setLangitude(parseFloat(model.map.longitude));
     setLatitude(parseFloat(model.map.latitude));
-    setPrefectureDefaultId(model.prefecture_id_default);
-    setPrefectureId(model.prefecture_id)
+    setPrefectureDefaultId(model.prefecture_id_default != 0 ? model.prefecture_id_default : "");
+    setPrefectureId(model.prefecture_id==0? "" : model.prefecture_id);
     setTableLoading(false);
     setLoader(false);
   }
@@ -130,13 +130,13 @@ export default function StaffManagementEditPage() {
                 <div className="font-bold mt-3">
                   {translate(localeJson, "place_basic_information")}
                 </div>
-                <div className="mt-1"> {translate(localeJson, 'post_letter') + zipCode}</div>
+                <div className="mt-1"> {zipCode != "000-0000" && translate(localeJson, 'post_letter') + zipCode}</div>
                 <div className="">{prefectureId && prefecturesCombined[prefectureId][locale]} {address2}</div>
                 <div className="">{phoneNumber}</div>
                 <div className="font-bold mt-3">
                   {translate(localeJson, "place_initial_information")}
                 </div>
-                <div className="mt-1">{translate(localeJson, 'post_letter') + defaultZipCode}</div>
+                <div className="mt-1">{defaultZipCode!= "000-0000" && translate(localeJson, 'post_letter') + defaultZipCode}</div>
                 <div className="">{prefectureDefaultId && prefecturesCombined[prefectureDefaultId][locale]} {addressDefault}</div>
                 <div className="mt-3">
                   <span className="font-bold">{translate(localeJson, "place_lat_long")}</span> : {coordinates}
