@@ -538,7 +538,7 @@ export default function PlaceUpdatePage() {
           values.tel = convertToSingleByte(values.tel);
           values.public_availability = Number(publicAvailabilityFlagValue)
           values.active_flg = Number(activeFlagValue)
-          if (id === 2 || id === 1) {
+          if (id == 2 || id == 1) {
             values.address = values.address.trim() || "null";
             values.postal_code_1 = values.postal_code_1 || "000";
             values.postal_code_2 = values.postal_code_2 || "0000";
