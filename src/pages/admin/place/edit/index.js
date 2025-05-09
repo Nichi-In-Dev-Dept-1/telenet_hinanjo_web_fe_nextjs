@@ -96,7 +96,81 @@ export default function PlaceUpdatePage() {
     formikRef.current.validateForm()
   }, [prefCount])
 
-  const schema = Yup.object().shape({
+  let schema;
+
+  if (id === 2 || id === 1) {
+    // Return a relaxed or optional schema for id 2 or 3
+    schema = Yup.object().shape({
+      name: Yup.string()
+      .required(
+        translate(localeJson, "evacuation_location") +
+        translate(localeJson, "is_required")
+      )
+      .max(
+        200,
+        translate(localeJson, "evacuation_location") +
+        translate(localeJson, "max_length_200")
+      ),
+    refugee_name: Yup.string().max(
+      200,
+      translate(localeJson, "evacuation_location_furigana") +
+      translate(localeJson, "max_length_200")
+    ),
+    name_en: Yup.string().max(
+      200,
+      translate(localeJson, "evacuation_location_english") +
+      translate(localeJson, "max_length_200")
+    ),
+      postal_code_1: Yup.string(),
+      postal_code_2: Yup.string(),
+      prefecture_id: Yup.string().nullable(),
+      address: Yup.string(),
+      address_en: Yup.string(),
+      postal_code_default_1: Yup.string(),
+      postal_code_default_2: Yup.string(),
+      prefecture_id_default: Yup.string().nullable(),
+      address_default: Yup.string(),
+      address_default_en: Yup.string(),
+      tel: Yup.string(),
+      latitude: Yup.number().required(
+        translate(localeJson, "latitude") + translate(localeJson, "is_required")
+      ),
+      longitude: Yup.number().required(
+        translate(localeJson, "longitude") + translate(localeJson, "is_required")
+      ),
+      altitude: Yup.string().required(
+        translate(localeJson, "altitude") + translate(localeJson, "is_required")
+      ),
+      total_place: Yup.string()
+        .required(
+          translate(localeJson, "capacity") + translate(localeJson, "is_required")
+        )
+        .max(
+          9,
+          translate(localeJson, "capacity") +
+          translate(localeJson, "capacity_max_length")
+        ),
+      remarks: Yup.string().max(
+        255,
+        translate(localeJson, "remarks") +
+        translate(localeJson, "max_length_255")
+      ),
+      closing_date: Yup.date().nullable()
+        .min(Yup.ref('opening_date'), translate(localeJson, "closing_date")),
+      opening_date:
+        Yup.date()
+          .nullable()
+          .when('closing_date', {
+            is: (closingDate) => {
+              return closingDate != null && (closingDate != undefined || closingDate != '')
+            },
+            then: () => Yup.date().required(translate(localeJson, "opening_required_when_closing_available")),
+            otherwise: () => Yup.date().nullable(),
+          }),
+  
+    });
+  } else {
+   schema = Yup.object().shape({
     name: Yup.string()
       .required(
         translate(localeJson, "evacuation_location") +
@@ -314,6 +388,7 @@ export default function PlaceUpdatePage() {
         }),
 
   });
+}
 
   /**
    * Get place list on mounting
@@ -463,6 +538,18 @@ export default function PlaceUpdatePage() {
           values.tel = convertToSingleByte(values.tel);
           values.public_availability = Number(publicAvailabilityFlagValue)
           values.active_flg = Number(activeFlagValue)
+          if (id == 2 || id == 1) {
+            values.address = values.address.trim() || "null";
+            values.postal_code_1 = values.postal_code_1 || "000";
+            values.postal_code_2 = values.postal_code_2 || "0000";
+            values.prefecture_id = values.prefecture_id || "0";
+            values.postal_code_default_1 = values.postal_code_default_1 || "000";
+            values.postal_code_default_2 = values.postal_code_default_2 || "0000";
+            values.prefecture_id_default = values.prefecture_id_default || "0";
+            values.address_default = values.address_default.trim() || "null";
+            values.tel = values.tel || "00000000000";
+          }
+          
           update(values, updatePlace);
         }}
       >
