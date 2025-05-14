@@ -19,6 +19,7 @@ const nextConfig = {
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
   swcMinify: true,
+  output: "export",
   images: {
     unoptimized: true,
   },
@@ -28,31 +29,6 @@ const nextConfig = {
      '@ant-design/icons-svg',
      '@rc-component',
   ],
- async headers() {
-    return [
-      {
-        source: '/(.*)', // Apply to all routes
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=31536000',
-          },
-          {
-            key: 'Content-Security-Policy',
-            value: "frame-ancestors 'self';",
-          },
-        ],
-      },
-    ]
-  },
 };
 
 module.exports = nextConfig;

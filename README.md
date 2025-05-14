@@ -1,6 +1,6 @@
 # 避難所管理システム
 
-It's a web application developed using Next.js (version 13.4.3) to manage evacuation centers, featuring various roles such as Admin, Staff, User, and HQ-Staff, along with other associated responsibilities.
+It's a web application developed using Next.js to manage evacuation centers, featuring various roles such as Admin, Staff, User, and HQ-Staff, along with other associated responsibilities.
 
 # ReactJS
 
