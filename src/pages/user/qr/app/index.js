@@ -120,7 +120,7 @@ export default function App() {
                                 style:{fontSize:"20px",height:"54px"},
                                 buttonClass: "qr-button flex align-items-center justify-content-center",
                                 text:" "+translate(localeJson, 'qr_scanner_popup_btn'),
-                                className:"pi pi-qrcode",   
+                                className:"pi pi-qrcode flex align-items-center justify-content-center",   
                                 onClick: () => { setOpenQrPopup(true) },
                             }} parentClass={"flex qr-button"} />
                         </div>
