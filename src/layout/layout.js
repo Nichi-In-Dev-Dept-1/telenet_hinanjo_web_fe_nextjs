@@ -370,7 +370,7 @@ const Layout = (props) => {
                 {!URLS.includes(path) && (
                     <div className="layout-sidebar">
                         <div ref={sidebarRef} className='layout_sidebar_scroll' style={{
-                            height: windowURL.startsWith('/staff') && "calc(100vh - 7rem)",
+                            height: (windowURL.startsWith('/staff')||windowURL.startsWith('/admin')) && "calc(100vh - 7rem)",
                         }}>
                             <AppSidebar />
                         </div>
