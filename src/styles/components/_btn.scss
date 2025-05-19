@@ -554,12 +554,6 @@
         border: 2px solid #d31720;
     }
 }
-@media screen and (max-width: 769px) {
-    .footerButtonText .p-button-label {
-        font-size: 16px !important;
-    }
-}
-
 .qr-button {
     .p-button {
         background-color: $exportButtonBgColor;
@@ -582,3 +576,19 @@
         border-color: $exportButtonHoverBgColor;
     }
 }
+@media screen and (max-width: 769px) {
+    .footerButtonText .p-button-label {
+        font-size: 16px !important;
+    }
+
+    .qr-button {
+    .p-button-label {
+        font-size: 12px;
+    }
+
+       .successButtonText .p-button-label {
+    font-size: 20px !important;
+    }
+
+    }}
+
