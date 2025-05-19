@@ -388,3 +388,10 @@
         }
     }
 }
+
+/* Add this for responsiveness */
+@media (max-width: 768px) {
+  .layout_admin_sidebar_scroll {
+    height: calc(100vh - 5rem); /* example for mobile */
+  }
+}
