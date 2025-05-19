@@ -118,7 +118,7 @@ export default function App() {
                                 type: 'submit',
                                 rounded: "true",
                                 style:{fontSize:"20px",height:"54px"},
-                                buttonClass: "qr-button",
+                                buttonClass: "qr-button flex align-items-center justify-content-center",
                                 text:" "+translate(localeJson, 'qr_scanner_popup_btn'),
                                 className:"pi pi-qrcode",   
                                 onClick: () => { setOpenQrPopup(true) },
