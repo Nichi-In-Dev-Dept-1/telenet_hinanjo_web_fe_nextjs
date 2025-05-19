@@ -369,8 +369,8 @@ const Layout = (props) => {
                 <AppTopbar ref={topbarRef} />
                 {!URLS.includes(path) && (
                     <div className="layout-sidebar">
-                        <div ref={sidebarRef} className='layout_sidebar_scroll' style={{
-                            height: (windowURL.startsWith('/staff')||windowURL.startsWith('/admin')) && "calc(100vh - 7rem)",
+                        <div ref={sidebarRef} className={`layout_sidebar_scroll ${windowURL.startsWith('/admin') && "layout_admin_sidebar_scroll"}`} style={{
+                            height: (windowURL.startsWith('/staff')) && "calc(100vh - 7rem)",
                         }}>
                             <AppSidebar />
                         </div>
